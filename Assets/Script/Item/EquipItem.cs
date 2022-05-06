@@ -3,6 +3,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Equip Item", menuName = "Item/Equip Item")]
 public class EquipItem : Item
 {
+    public enum Grade
+    {
+        Normal,
+        Rare,
+        Unique,
+        Epic,
+    }
+
     /// <summary>
     /// 장비 강화 능력치
     /// </summary>
@@ -26,6 +34,10 @@ public class EquipItem : Item
         public EStatusType equipEffect;
         public int value;
     }
+
+    [SerializeField]
+    private Grade _grade;
+    public Grade grade => _grade;
 
     public EquipStatus[] equipAbilities;
 

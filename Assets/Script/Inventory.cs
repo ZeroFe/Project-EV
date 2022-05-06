@@ -12,16 +12,11 @@ public class Inventory : MonoBehaviour
     public delegate void AddItemHandler(Item item);
     #endregion
 
+    public event AddItemHandler OnAddItem;
+
     // int¿¡ µé¾î°¡´Â °ªÀº Item Code
     public class AddItemEvent : UnityEvent<int> { }
     public AddItemEvent addItemEvent { get; set; } = new AddItemEvent();
-
-    //int¿¡ µé¾î°¡´Â °ªÀº Earned Gold Amount
-    public class AddGoldEvent : UnityEvent<int> { }
-    public AddGoldEvent addGoldEvent { get; set; } = new AddGoldEvent();
-    public class SubGoldEvent : UnityEvent<int> { }
-
-    public SubGoldEvent subGoldEvent = new SubGoldEvent();
 
 
     public UnityEvent UseConsumableEvent { get; set; } = new UnityEvent();
@@ -174,41 +169,6 @@ public class Inventory : MonoBehaviour
     }
     #endregion
 
-    #region Earn / Lost Gold
-    /// <summary>
-    /// amount¸¸Å­ °ñµå¸¦ È¹µæÇÏ°í isInvokeEvent¿¡ µû¶ó °ñµå È¹µæ ÀÌº¥Æ®¸¦ È£ÃâÇÑ´Ù
-    /// </summary>
-    /// <param name="amount">È¹µæ·®</param>
-    /// <param name="isInvokeEvent">°ñµå È¹µæ ÀÌº¥Æ® ¹ß»ý ¿©ºÎ</param>
-    public void AddGold(int amount, bool isInvokeEvent)
-    {
-        Debug.Log("before Gold = " + _gold);
-
-        _gold += amount;
-
-        if (isInvokeEvent)
-            addGoldEvent?.Invoke(amount);
-
-        Debug.Log("after Gold = " + _gold);
-    }
-
-    public void SubGold(int gold, bool isSubGoldEvent)
-    {
-        Debug.Log("before Gold = " + _gold);
-
-        if (isSubGoldEvent)
-        {
-            subGoldEvent?.Invoke(gold);
-            return;
-        }
-
-        _gold -= gold;
-
-
-        Debug.Log("after Gold = " + _gold);
-    }
-    #endregion
-
     #region EquipAbility
     public int GetEquipAbilityIncreaseSize(EAbility ability)
     {
@@ -239,7 +199,6 @@ public class Inventory : MonoBehaviour
         }
     }
     #endregion
-
 
     private void UseConsumable(ConsumableItem consumable)
     {

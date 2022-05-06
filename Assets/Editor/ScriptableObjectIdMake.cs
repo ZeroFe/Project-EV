@@ -13,7 +13,7 @@ public static class ScriptableObjectIdMake
             .Where(b => b).ToArray();
         for (int i = 0; i < findAssets.Length; i++)
         {
-            availableItems[i].ID = findAssets[i].GetHashCode();
+            //availableItems[i].ID = findAssets[i].GetHashCode();
             EditorUtility.SetDirty(availableItems[i]);
         }
     }
