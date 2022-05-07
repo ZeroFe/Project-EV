@@ -33,6 +33,6 @@ public class SimpleHpChangeEffect : UseEffect
 
     public override void TakeUseEffect()
     {
-        throw new System.NotImplementedException();
+        Debug.Log("call Simple Hp Change");
     }
 }

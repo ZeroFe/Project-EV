@@ -21,34 +21,7 @@ public class Inventory : MonoBehaviour
 
     public UnityEvent UseConsumableEvent { get; set; } = new UnityEvent();
 
-    public class ConsumableItemSlot
-    {
-        public ConsumableItem item;
-        public int stack;
-
-        public ConsumableItemSlot(ConsumableItem newConsumable)
-        {
-            item = newConsumable;
-            stack = 1;
-        }
-    }
-
-    public class EquipItemSlot
-    {
-        public EquipItem item;
-        public int equipPassiveCount;
-
-        public EquipItemSlot(EquipItem newEquip)
-        {
-            item = newEquip;
-            equipPassiveCount = 0;
-        }
-    }
-
-    public List<EquipItemSlot> EquipItems { get; private set; } = new List<EquipItemSlot>();
-    public List<ConsumableItemSlot> ConsumableItems { get; private set; } = new List<ConsumableItemSlot>();
-
-    private GameObject _inventoryUser;
+    public List<EquipItem> EquipItems { get; private set; } = new List<EquipItem>();
 
     public int Gold
     {
@@ -60,60 +33,12 @@ public class Inventory : MonoBehaviour
     private int[] _equipAbilityIncreaseSizeArr = new int[Enum.GetValues(typeof(EAbility)).Length];
     public int[] equipAbilityIncreaseSizeArrPublic = new int[Enum.GetValues(typeof(EAbility)).Length];
 
-    public Inventory(GameObject userObject, int equipCapacity = 10, int consumableCapacity = 3, int gold = 0)
+    private void Awake()
     {
-        _inventoryUser = userObject;
-        EquipItems.Capacity = equipCapacity;
-        ConsumableItems.Capacity = consumableCapacity;
-        _gold = gold;
 
-        RegisterEquipEvent();
     }
 
-    #region Implement Passive, Upgrade
-    private void RegisterEquipEvent()
-    {
-        //var playerStat = _inventoryUser.GetComponent<Player>();
-        //_inventoryUser.GetComponent<Player>().OnGiveDamage.Subscribe((data) => CallItemEvent(data.eventType, data.damageAmount));
-    }
-
-    /// <summary>
-    /// 해당 이벤트가 일어나면 장비 효과 발동(패시브, 성장)
-    /// </summary>
-    /// <param name="condition">패시브 발동 조건</param>
-    /// <param name="count">패시브 조건 인자</param>
-    //private void CallItemEvent(EventObject eventType, int addedCount)
-    //{
-    //    foreach (var equipSlot in EquipItems)
-    //    {
-    //        if (equipSlot.item.passiveCondition.conditionEvent == eventType)
-    //        {
-    //            ExecuteEquipPassive(equipSlot, addedCount);
-    //        }
-    //    }
-    //}
-
-    /// <summary>
-    /// 장비 패시브를 추가 조건에 따라 실행
-    /// ex) n회에 한 번 실행 / n 이상일 때 실행 / n 이하일 때 실행
-    /// </summary>
-    /// <param name="equipSlot">적용 장비</param>
-    /// <param name="addedCount"></param>
-    private void ExecuteEquipPassive(EquipItemSlot equipSlot, int addedCount)
-    {
-        equipSlot.equipPassiveCount = equipSlot.item.passiveCondition.conditionOption.AddCount(equipSlot.equipPassiveCount, addedCount);
-        if (equipSlot.item.passiveCondition.SatisfyCondition(equipSlot.item.passiveCount, equipSlot.equipPassiveCount))
-        {
-            foreach (var item in equipSlot.item.passiveEffect)
-            {
-                item.GetReference().TakeUseEffect();
-            }
-        }
-        equipSlot.equipPassiveCount = equipSlot.item.passiveCondition.NextUserCount(equipSlot.equipPassiveCount, addedCount);
-    }
-    #endregion
-
-    #region Add / Delete Item
+    #region Add Item
     public bool AddItem(Item newItem)
     {
         if (newItem is EquipItem)
@@ -137,17 +62,21 @@ public class Inventory : MonoBehaviour
     /// <returns>아이템 넣기 성공했는지</returns>
     private bool AddEquip(EquipItem newEquip)
     {
-        if (EquipItems.Count >= EquipItems.Capacity)
-        {
-            return false;
-        }
+        Debug.Log($"add item - {newEquip.name}");
 
-        EquipItems.Add(new EquipItemSlot(newEquip));
+        EquipItems.Add(newEquip);
         AddEquipAbility(newEquip);
+
+        RegisterPassive(newEquip);
 
         addItemEvent.Invoke(newEquip.name.GetHashCode());
 
         return true;
+    }
+
+    private void RegisterPassive(EquipItem equip)
+    {
+        equip.Register(gameObject);
     }
 
     /// <summary>

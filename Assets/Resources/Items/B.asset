@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2766960872773512094
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac1e935af7a70d54b9002b8f82aa242d, type: 3}
+  m_Name: B_ConditionalEffect
+  m_EditorClassIdentifier: 
+  descriptor:
+    rid: 3640234681948962817
+  Condition: {fileID: 0}
+  threshold:
+    Value: 1
+    Increase: 0
+  RemoveConditionalEffect: 0
+  IsRelationStack: 0
+  StackBonusRate: 0
+  Effect: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 3640234681948962817
+      type: {class: Descriptor, ns: , asm: Assembly-CSharp}
+      data:
+        text: 
+        description: "\uC870\uAC74 A \uC0C1\uD0DC\uC77C \uB54C "
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f902df296d97344c9b214790424bae9, type: 3}
+  m_Name: B
+  m_EditorClassIdentifier: 
+  descriptor:
+    rid: 3640234671503048704
+  Image: {fileID: 0}
+  _grade: 0
+  equipAbilities: []
+  passiveCondition: {fileID: 11400000, guid: 1c7c629f69c29cb4fa778ff2b86249f9, type: 2}
+  passiveEffect:
+  - reference: {fileID: -2766960872773512094}
+  references:
+    version: 2
+    RefIds:
+    - rid: 3640234671503048704
+      type: {class: Descriptor, ns: , asm: Assembly-CSharp}
+      data:
+        text: 
+        description: item Explain
+--- !u!114 &8509142084941581335
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1787c9cddbf1bd54a9d6a95555c50555, type: 3}
+  m_Name: New Equip Item_SimpleHpChangeEffect
+  m_EditorClassIdentifier: 
+  descriptor:
+    rid: 3640234681948962816
+  IsHeal: 0
+  IsTrueDamage: 0
+  FixedAmount: 0
+  EnhancePercentRate: 0
+  RatioType: 0
+  RatioPercent: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 3640234681948962816
+      type: {class: Descriptor, ns: , asm: Assembly-CSharp}
+      data:
+        text: 
+        description: 'SimpleHpChange : 0 + 0 + 0'
