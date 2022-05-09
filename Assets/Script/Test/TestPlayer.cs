@@ -25,11 +25,13 @@ public class TestPlayer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
+            Debug.Log("Hit Key Jump");
             onJump?.Invoke();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetKeyDown(KeyCode.M))
         {
+            Debug.Log("Hit Plus");
             inventory.AddItem(ItemManager.Instance.DequeueEquipItem());
         }
     }

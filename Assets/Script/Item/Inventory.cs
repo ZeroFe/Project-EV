@@ -88,6 +88,7 @@ public class Inventory : MonoBehaviour
     {
         // 소비 아이템 획득 시 이벤트 발생
 
+        
         // 소비 아이템 적용
         foreach (var useEffectReference in item.consumeEffects)
         {

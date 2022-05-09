@@ -30,11 +30,13 @@ public class ItemManager : Singleton<ItemManager>
     // 초기 드랍 테이블 세팅
     void InitDropTable(Item[] items)
     {
+        Debug.Log("init drop table");
         foreach (var item in items)
         {
             if (item is EquipItem equipItem)
             {
                 _equipItemDropList.Add(equipItem);
+                Debug.Log($"add item - {equipItem.name}");
             }
         }
     }
