@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyFSM : MonoBehaviour
 {
@@ -15,19 +17,25 @@ public class EnemyFSM : MonoBehaviour
         Dead
     }
 
+    public float moveSpeed = 3.0f;
+
+    [Header("FSM")]
     // 시야 거리 - 벡터 내적을 이용해서 플레이어 위치 탐색
-    public float sightRange;
-    public float sightAngle;
+    public float sightRange = 10.0f;
+    public float sightAngle = 30.0f;
 
     [SerializeField, Tooltip("플레이어를 감지하는 거리")]
-    public float findDistance;
-    public float attackDistance;
-    public float returnDistance;
+    public float findDistance = 6.0f;
+    public float attackDistance = 1.5f;
+    public float returnDistance = 15.0f;
+    private bool isDead = false;
 
     // 초기 위치 저장용 - 일정 거리 이상 벗어나면 돌아간다
     private Vector3 originPos;
 
     private EnemyState eState = EnemyState.Idle;
+
+    private NavMeshAgent agent;
 
     private CharacterController characterController;
 
@@ -35,43 +43,62 @@ public class EnemyFSM : MonoBehaviour
 
     private void Awake()
     {
-        characterController = GetComponent<CharacterController>();
+        agent = GetComponent<NavMeshAgent>();
+    }
+
+    private void OnEnable()
+    {
+        
+    }
+
+    private void OnDisable()
+    {
+        
     }
 
     private void Start()
     {
         playerTr = GameObject.Find("Player").transform;
         originPos = transform.position;
+
+        StartCoroutine(CheckMonterState());
+
     }
 
-    private void Update()
+    IEnumerator CheckMonterState()
     {
-        switch (eState)
+        while (!isDead)
         {
-            case EnemyState.Idle:
-                Idle();
-                break;
-            case EnemyState.Move:
-                Move();
-                break;
-            case EnemyState.Attack:
-                Attack();
-                break;
-            case EnemyState.Return:
-                Return();
-                break;
-            case EnemyState.Damaged:
-                Damaged();
-                break;
-            case EnemyState.Dead:
-                Dead();
-                break;
+            yield return new WaitForSeconds(0.3f);
+
+            // 몬스터가 죽으면 코루틴 종료
+            if (eState == EnemyState.Dead)
+            {
+                yield break;
+            }
+
+            float distance = Vector3.Distance(playerTr.position, transform.position);
+
+            if (distance <= attackDistance)
+            {
+                eState = EnemyState.Attack;
+            }
+            // 추적 상태
+            else if (distance <= findDistance)
+            {
+                eState = EnemyState.Move;
+            }
+            else
+            {
+                eState = EnemyState.Idle;
+            }
         }
     }
 
     private void Idle()
     {
-        if (Vector3.Distance(playerTr.position, transform.position) < findDistance)
+        agent.isStopped = true;
+        if (Vector3.Distance(playerTr.position, transform.position) <= findDistance)
         {
             eState = EnemyState.Move;
             // 인식 효과 띄우기
@@ -81,12 +108,22 @@ public class EnemyFSM : MonoBehaviour
 
     private void Move()
     {
-
+        agent.SetDestination(playerTr.position);
+        agent.isStopped = false;
+        if (Vector3.Distance(playerTr.position, transform.position) <= attackDistance)
+        {
+            eState = EnemyState.Attack;
+            // 애니메이션 처리
+        }
     }
 
     private void Attack()
     {
-
+        if (Vector3.Distance(playerTr.position, transform.position) <= attackDistance)
+        {
+            eState = EnemyState.Attack;
+            // 애니메이션 처리
+        }
     }
 
     private void Return()
@@ -102,5 +139,10 @@ public class EnemyFSM : MonoBehaviour
     private void Dead()
     {
 
+    }
+
+    private void OnDrawGizmos()
+    {
+        
     }
 }
