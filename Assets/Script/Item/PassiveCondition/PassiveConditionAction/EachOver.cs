@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PassiveCondition_TypeEqual : PassiveConditionOption
+public class EachOver : PassiveConditionAction
 {
     public override int AddCount(int userCount, int newAddedCount)
     {
@@ -9,10 +9,10 @@ public class PassiveCondition_TypeEqual : PassiveConditionOption
 
     public override bool SatisfyCondition(int passiveCount, int userCount)
     {
-        return passiveCount == userCount;
+        return passiveCount <= userCount;
     }
 
-    public override int ResetCount(int passiveCount, int userCount)
+    public override int NextCount(int passiveCount, int userCount)
     {
         return 0;
     }

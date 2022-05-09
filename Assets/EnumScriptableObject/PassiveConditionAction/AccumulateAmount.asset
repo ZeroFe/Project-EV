@@ -10,5 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02edd4ebc2429964b9d2af9c11686812, type: 3}
-  m_Name: PassiveCondition_AccumulateAmount
+  m_Name: AccumulateAmount
   m_EditorClassIdentifier: 

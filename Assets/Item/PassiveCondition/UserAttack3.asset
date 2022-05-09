@@ -9,6 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b681fb5b8304d6a44a2c5aa51d686bc2, type: 3}
-  m_Name: PassiveCondition_EachOver
+  m_Script: {fileID: 11500000, guid: b8b1915761d01ac459e31d25b46ef56c, type: 3}
+  m_Name: UserAttack3
   m_EditorClassIdentifier: 
+  _conditionAction: {fileID: 11400000, guid: eddfb4c7724b7554e9c1b96bf960e184, type: 2}
+  _conditionActionCount: 3

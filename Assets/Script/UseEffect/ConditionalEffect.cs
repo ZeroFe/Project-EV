@@ -27,6 +27,6 @@ public class ConditionalEffect : UseEffect
 
     public override void TakeUseEffect()
     {
-        throw new System.NotImplementedException();
+        Debug.Log($"Conditional Effect");
     }
 }
