@@ -23,6 +23,12 @@ public class TestPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Debug.Log("Hit T");
+            
+        }
+
         if (Input.GetKeyDown(KeyCode.J))
         {
             Debug.Log("Hit Key Jump");

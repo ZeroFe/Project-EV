@@ -22,15 +22,13 @@ public class CameraRotate : MonoBehaviour
     // 사용자의 마우스 움직임을 누적해서 회전값으로 사용하고 싶다
     void Update()
     {
-        float mx = Input.GetAxis("Mouse X");
-        float my = Input.GetAxis("Mouse Y");
+        //float my = Input.GetAxis("Mouse Y");
 
-        // 회전 값으로 사용
-        ry += mx * Time.deltaTime * rotationSpeed;
-        rx -= my * Time.deltaTime * rotationSpeed;
-        rx = Mathf.Clamp(rx, -90.0f, 90.0f);
+        //// 회전 값으로 사용
+        //ry -= my * Time.deltaTime * rotationSpeed;
+        //rx = Mathf.Clamp(rx, -90.0f, 90.0f);
 
-        transform.eulerAngles = new Vector3(rx, ry, 0);
+        //transform.localRotation = Quaternion.AngleAxis(ry, Vector3.right);
     }
 
     private void OnDisable()
