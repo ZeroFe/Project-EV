@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
-public class PlayerMove : MonoBehaviour
+public class PlayerCtrl : MonoBehaviour
 {
     public static readonly float cooldownTime = 0.1f;
 
@@ -170,5 +170,36 @@ public class PlayerMove : MonoBehaviour
             }
         }
     }
+    #endregion
+
+    #region Weapon Management
+
+    void PickupWeapon(Weapon prefab)
+    {
+        //var w = Instantiate(prefab, WeaponPosition, false);
+        //w.name = prefab.name;
+        //w.transform.localPosition = Vector3.zero;
+        //w.transform.localRotation = Quaternion.identity;
+        //w.gameObject.SetActive(false);
+
+        //w.PickedUp(this);
+
+        //m_Weapons.Add(w);
+    }
+
+    void ChangeWeapon()
+    {
+
+    }
+
+    void Reload()
+    {
+        // 일단 애니메이션 안 하고 Reload만 하게
+        if (Input.GetButtonDown("Reload"))
+        {
+            
+        }
+    }
+
     #endregion
 }
