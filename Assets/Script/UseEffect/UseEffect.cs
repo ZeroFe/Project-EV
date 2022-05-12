@@ -5,7 +5,7 @@ using UnityEngine;
 /// 한 번에 여러가지 효과를 실행할 수 있도록 UseEffect[] 형태로 사용하길 권장
 /// 새로운 효과를 제작하고 싶은 경우 UseEffect 상속을 받아서 구현할 것
 /// </summary>
-public abstract class UseEffect : DescriptableObject
+public abstract class UseEffect : ScriptableObject
 {
     /// <summary>
     /// 효과를 적용하는 함수
@@ -14,7 +14,7 @@ public abstract class UseEffect : DescriptableObject
 
     /// <summary></summary>
     /// <returns>능력을 설명하는 텍스트('\n' 없음)</returns>
-    public abstract override string Explain();
+    public abstract string Explain();
 }
 
 [System.Serializable]

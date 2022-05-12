@@ -351,7 +351,7 @@ public class Weapon : MonoBehaviour
 
     void Update()
     {
-        UpdateControllerState();        
+        //UpdateControllerState();        
         
         if (m_ShotTimer > 0)
             m_ShotTimer -= Time.deltaTime;

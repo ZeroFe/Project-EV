@@ -6,7 +6,7 @@ using UnityEngine;
 // 아이템 관리 싱클톤 클래스
 public class ItemManager : Singleton<ItemManager>
 {
-    public DroppedItemComponent droppedItemPrefab;
+    public GameObject upgradeUI;
 
     private List<EquipItem> _equipItemDropList = new List<EquipItem>();
     private int currEquipIndex = 0;
@@ -88,4 +88,16 @@ public class ItemManager : Singleton<ItemManager>
     //    droppedItemPool.Return(droppedItem);
     //}
     #endregion
+
+    public void GetEnhance()
+    {
+        // 업그레이드 창 띄우기
+        GameManager.Instance.SetCursorDisplay(true);
+        upgradeUI.SetActive(true);
+    }
+
+    public void EndEnhance()
+    {
+        RoundSystem.Instance.NextRound();
+    }
 }

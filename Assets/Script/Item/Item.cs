@@ -1,11 +1,6 @@
 using UnityEngine;
 
-public class Item : DescriptableObject
+public class Item : ScriptableObject
 {
     public Sprite Image = null;
-
-    public override string Explain()
-    {
-        return "item Explain";
-    }
 }
