@@ -58,7 +58,7 @@ public class RoundSystem : Singleton<RoundSystem>
             // 아니면 업그레이드 띄우기
             else
             {
-                ItemManager.Instance.GetEnhance();
+                ItemManager.Instance.EnhancePlayer();
             }
         }
     }

@@ -3,10 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// 아이템 관리 싱클톤 클래스
+/// <summary>
+/// 강화 목록을 관리하는 클래스
+/// </summary>
+[DisallowMultipleComponent]
 public class ItemManager : Singleton<ItemManager>
 {
+    // 플레이어만 아이템 적용하면 되므로 플레이어를 추가한다
+    [SerializeField] private GameObject player;
+    private Inventory playerInventory;
+
     public GameObject upgradeUI;
+
+    // 선행 조건이 되는 강화들을 관리
+    private Dictionary<Item, List<Item>> PrerequisitesDict = new Dictionary<Item, List<Item>>();
+    // 미추가된 아이템
+    private HashSet<Item> items = new HashSet<Item>();
 
     private List<EquipItem> _equipItemDropList = new List<EquipItem>();
     private int currEquipIndex = 0;
@@ -15,6 +27,9 @@ public class ItemManager : Singleton<ItemManager>
     private void Awake()
     {
         //droppedItemPool = new ObjectPooling<DroppedItemComponent>(transform, droppedItemPrefab);
+        Debug.Assert(player, "Player not be set in Enhance Manager");
+
+        playerInventory = GetComponent<Inventory>();
     }
 
     public void Start()
@@ -26,7 +41,6 @@ public class ItemManager : Singleton<ItemManager>
         // 
     }
 
-    #region 아이템 드롭 테이블 관리
     // 초기 드랍 테이블 세팅
     void InitDropTable(Item[] items)
     {
@@ -40,17 +54,9 @@ public class ItemManager : Singleton<ItemManager>
             }
         }
     }
-    // 드랍 테이블 리필
-    #endregion
-
     #endregion
 
     #region 아이템 가져오기
-
-    //public ConsumableItem GetConsumableItem()
-    //{
-
-    //}
 
     public EquipItem DequeueEquipItem()
     {
@@ -65,39 +71,31 @@ public class ItemManager : Singleton<ItemManager>
 
     #endregion
 
-    #region 아이템 드롭
-    public void DropEquip()
-    {
-
-    }
-
-    public void DropConsumable()
-    {
-
-    }
-
-    //public void DropItem(Item item, Vector3 dropPos)
-    //{
-    //    var droppedItem = droppedItemPool.Rent();
-    //    droppedItem.ItemData = item;
-    //    droppedItem.transform.position = dropPos;
-    //}
-
-    //public void RemoveDroppedItem(DroppedItemComponent droppedItem)
-    //{
-    //    droppedItemPool.Return(droppedItem);
-    //}
-    #endregion
-
-    public void GetEnhance()
+    public void EnhancePlayer()
     {
         // 업그레이드 창 띄우기
         GameManager.Instance.SetCursorDisplay(true);
         upgradeUI.SetActive(true);
     }
 
-    public void EndEnhance()
+    public void EndEnhance(Item enhance)
     {
+        // 선행 조건 없애기
+        if (PrerequisitesDict.ContainsKey(enhance))
+        {
+            foreach (var item in PrerequisitesDict[enhance])
+            {
+                //item.
+                // 아이템에 남은 선행 조건이 없으면 미추가 목록에서 지우고 아이템을 추가한다
+            }
+
+            PrerequisitesDict.Remove(enhance);
+        }
+        // 플레이어에게 강화 적용
+        playerInventory.AddItem(enhance);
+
+        // 다음 라운드 시작
+        GameManager.Instance.SetCursorDisplay(false);
         RoundSystem.Instance.NextRound();
     }
 }
