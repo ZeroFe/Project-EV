@@ -13,7 +13,7 @@ public class UpgradeEnhanceViewer : MonoBehaviour
 
     private Outline selectOutline;
 
-    private Item upgradeEnhance;
+    private Enhance upgradeEnhance;
 
     private void Awake()
     {
@@ -36,11 +36,11 @@ public class UpgradeEnhanceViewer : MonoBehaviour
         Debug.Log("Mouse Down");
     }
 
-    public void DrawEnhance(Item enhance)
+    public void DrawEnhance(Enhance enhance)
     {
-        thumbnail.sprite = enhance.Image;
+        thumbnail.sprite = enhance.Icon;
         name.text = enhance.name;
-        //description.text = enhance.description;
+        description.text = enhance.Description;
         upgradeEnhance = enhance;
     }
 }

@@ -33,7 +33,7 @@ public class TestPlayer : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M))
         {
             Debug.Log("Hit Plus");
-            inventory.AddItem(ItemManager.Instance.DequeueEquipItem());
+            // 아이템 추가
         }
     }
 

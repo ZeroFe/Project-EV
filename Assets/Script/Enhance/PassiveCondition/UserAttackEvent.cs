@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 유저가 공격을 실행했을 때 발동되는 이벤트
 /// </summary>
-[CreateAssetMenu(fileName = "New User Attack Event", menuName = "Item/Passive Condition/UserAttackEvent")]
+[CreateAssetMenu(fileName = "New User Attack Event", menuName = "Enhance/Passive Condition/UserAttackEvent")]
 public class UserAttackEvent : PassiveCondition
 {
     public override void Register(GameObject target)

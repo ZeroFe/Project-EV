@@ -6,7 +6,7 @@ public class UpgradeListViewer : Singleton<UpgradeListViewer>
 {
     [SerializeField] private List<UpgradeEnhanceViewer> upgradeEnhanceViewers;
 
-    public void SetUpgradeLists(List<Item> enhances)
+    public void SetUpgradeLists(List<Enhance> enhances)
     {
         int count = enhances.Count;
         Debug.Assert(count > upgradeEnhanceViewers.Count);
@@ -22,9 +22,9 @@ public class UpgradeListViewer : Singleton<UpgradeListViewer>
         }
     }
 
-    public void SelectEnhance(Item enhance)
+    public void SelectEnhance(Enhance enhance)
     {
-        ItemManager.Instance.EndEnhance(enhance);
+        EnhanceSystem.Instance.EndEnhance(enhance);
         gameObject.SetActive(false);
     }
 
