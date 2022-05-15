@@ -5,14 +5,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class UpgradeEnhanceViewer : MonoBehaviour
+public class UpgradeEnhanceView : Singleton<UpgradeEnhanceView>
 {
+    // UI
     [SerializeField] private Image thumbnail;
     [SerializeField] private TextMeshProUGUI name;
     [SerializeField] private TextMeshProUGUI description;
-
     private Outline selectOutline;
 
+    public Action<Enhance> SelectEnhanceHandler;
     private Enhance upgradeEnhance;
 
     private void Awake()
@@ -34,6 +35,8 @@ public class UpgradeEnhanceViewer : MonoBehaviour
     private void OnMouseDown()
     {
         Debug.Log("Mouse Down");
+        // 상위 ui에게 알린다
+        SelectEnhanceHandler.Invoke(upgradeEnhance);
     }
 
     public void DrawEnhance(Enhance enhance)

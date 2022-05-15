@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class RoundSystem : Singleton<RoundSystem>
@@ -58,7 +59,8 @@ public class RoundSystem : Singleton<RoundSystem>
             // 아니면 업그레이드 띄우기
             else
             {
-                EnhanceSystem.Instance.EnhancePlayer();
+                WindowSystem.Instance.OpenWindow(UpgradeWindow.Instance.gameObject, false);
+                UpgradeWindow.Instance.SetUpgradeWindow(EnhanceSystem.Instance.GetRandomEnhances(3));
             }
         }
     }

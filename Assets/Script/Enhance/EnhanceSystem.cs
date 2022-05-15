@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 /// <summary>
@@ -73,17 +72,24 @@ public class EnhanceSystem : Singleton<EnhanceSystem>
             }
         }
     }
-
-    //private void 
-
-    public void EnhancePlayer()
+    
+    public List<Enhance> GetRandomEnhances(int enhanceCount)
     {
-        // 업그레이드 창 띄우기
-        GameManager.Instance.SetCursorDisplay(true);
-        //upgradeUI.SetActive(true);
+        var enhances = new List<Enhance>();
+
+        while (enhances.Count < enhanceCount)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, upgradableEnhances.Count);
+            if (!enhances.Exists(x => x == upgradableEnhances[randomIndex]))
+            {
+                enhances.Add(upgradableEnhances[randomIndex]);
+            }
+        }
+
+        return enhances;
     }
 
-    public void EndEnhance(Enhance enhance)
+    public void ApplyEnhance(Enhance enhance)
     {
         // 선행 조건 없애기
         var original = codeNameToOriginalDict[enhance.CodeName];
@@ -105,11 +111,10 @@ public class EnhanceSystem : Singleton<EnhanceSystem>
 
             prerequisitesDict.Remove(enhance);
         }
+
         // 플레이어에게 강화 적용
         playerInventory.AddItem(enhance);
-
-        // 다음 라운드 시작
-        GameManager.Instance.SetCursorDisplay(false);
-        RoundSystem.Instance.NextRound();
+        // 적용된 강화는 업그레이드 목록에서 제외한다
+        upgradableEnhances.Remove(enhance);
     }
 }
