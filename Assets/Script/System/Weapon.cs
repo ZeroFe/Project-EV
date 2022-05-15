@@ -8,6 +8,9 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// 무한 탄창, 무기 하나 방식의 
+/// </summary>
 public class Weapon : MonoBehaviour
 {
     static RaycastHit[] s_HitInfoBuffer = new RaycastHit[8];
@@ -39,41 +42,42 @@ public class Weapon : MonoBehaviour
         public float screenShakeMultiplier = 1.0f;
     }
 
+    // Weapon의 경우 강화 등 외부에서 수정/변경할 일이 많으므로
+    // 의도적으로 public으로 만들어서 사용하는게 적합하다 판단
+    // 이후 property를 통해 수정하도록 만들 수도 있음
+    [Tooltip("클릭 당 사격인지, 자동 사격인지")]
     public TriggerType triggerType = TriggerType.Manual;
+    [Tooltip("총알 적용 방식")]
     public WeaponType weaponType = WeaponType.Raycast;
+
+    // 발사 관련
+    [Tooltip("발사 딜레이")]
     public float fireRate = 0.5f;
+    private bool m_ShotDone;
+    private float m_ShotTimer = -1.0f;
+
+    [Tooltip("재장전 딜레이")]
     public float reloadTime = 2.0f;
+    private float currentReloadTime = 0.0f;
+
+    [Tooltip("탄창 크기")]
     public int clipSize = 4;
-
-    // 데미지 주는 방식 바꿔서 사용하겠음
+    private int currentAmmoCount;
+    
+    // 데미지, 효과
     public float damage = 1.0f;
-
-    public int BulletClip = 30;
-    public int currentBulletCount = 30;
+    private float damageMultiplier = 1.0f;
 
     public Projectile projectilePrefab;
     public float projectileLaunchForce = 200.0f;
 
-    public Transform EndPoint; 
-
     public AdvancedSettings advancedSettings;
-    
-    [Header("Animation Clips")]
-    public AnimationClip FireAnimationClip;
-    public AnimationClip ReloadAnimationClip;
 
-    [Header("Audio Clips")]
-    public AudioClip FireAudioClip;
-    public AudioClip ReloadAudioClip;
-    
-    [Header("Visual Settings")]
-    public LineRenderer PrefabRayTrail;
-    public bool DisabledOnEmpty;
-    
-    [Header("Visual Display")]
-    public AmmoDisplay AmmoDisplay;
+    // 그 외
+    public Transform EndPoint;
 
-    public bool triggerDown
+    private bool m_TriggerDown;
+    public bool TriggerDown
     {
         get { return m_TriggerDown; }
         set 
@@ -83,21 +87,14 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    WeaponState m_CurrentState;
     public WeaponState CurrentState => m_CurrentState;
-    public int ClipContent => m_ClipContent;
 
     public PlayerCtrl Owner => owner;
     private PlayerCtrl owner;
-    //public Controller Owner => m_Owner;
-
-    //Controller m_Owner;
+    private Camera _main;
     
-    Animator m_Animator;
-    WeaponState m_CurrentState;
-    bool m_ShotDone;
-    float m_ShotTimer = -1.0f;
-    bool m_TriggerDown;
-    int m_ClipContent;
+    //Animator m_Animator;
 
     AudioSource m_Source;
 
@@ -119,16 +116,15 @@ public class Weapon : MonoBehaviour
 
     void Awake()
     {
-        m_Animator = GetComponentInChildren<Animator>();
-        m_Source = GetComponentInChildren<AudioSource>();
-        m_ClipContent = clipSize;
+        // 애니메이터, 소리는 후적용
+        //m_Animator = GetComponentInChildren<Animator>();
+        //m_Source = GetComponentInChildren<AudioSource>();
+        _main = Camera.main;
 
-        if (PrefabRayTrail != null)
-        {
-            const int trailPoolSize = 16;
-            PoolSystem.Instance.InitPool(PrefabRayTrail, trailPoolSize);
-        }
+        // 총알 설정
+        currentAmmoCount = clipSize;
 
+        // 투사체 방식 설정
         if (projectilePrefab != null)
         {
             //a minimum of 4 is useful for weapon that have a clip size of 1 and where you can throw a second
@@ -150,81 +146,42 @@ public class Weapon : MonoBehaviour
 
     public void PutAway()
     {
-        m_Animator.WriteDefaultValues();
+        //m_Animator.WriteDefaultValues();
         
-        for (int i = 0; i < m_ActiveTrails.Count; ++i)
-        {
-            var activeTrail = m_ActiveTrails[i];
-            m_ActiveTrails[i].renderer.gameObject.SetActive(false);
-        }
+        //for (int i = 0; i < m_ActiveTrails.Count; ++i)
+        //{
+        //    var activeTrail = m_ActiveTrails[i];
+        //    m_ActiveTrails[i].renderer.gameObject.SetActive(false);
+        //}
         
-        m_ActiveTrails.Clear();
+        //m_ActiveTrails.Clear();
     }
 
-    public void Selected()
-    {
-        var ammoRemaining = currentBulletCount;
-        
-        if(DisabledOnEmpty)
-            gameObject.SetActive(ammoRemaining != 0 || m_ClipContent != 0);
-        
-        if(FireAnimationClip != null)
-            m_Animator.SetFloat("fireSpeed",  FireAnimationClip.length / fireRate);
-        
-        if(ReloadAnimationClip != null)
-            m_Animator.SetFloat("reloadSpeed", ReloadAnimationClip.length / reloadTime);
-        
-        m_CurrentState = WeaponState.Idle;
-
-        triggerDown = false;
-        m_ShotDone = false;
-        
-        WeaponInfoUI.Instance.UpdateWeaponName(this);
-        WeaponInfoUI.Instance.UpdateClipInfo(this);
-        WeaponInfoUI.Instance.UpdateAmmoAmount(currentBulletCount);
-        
-        if(AmmoDisplay)
-            AmmoDisplay.UpdateAmount(m_ClipContent, clipSize);
-
-        if (m_ClipContent == 0 && ammoRemaining != 0)
-        { 
-            //this can only happen if the weapon ammo reserve was empty and we picked some since then. So directly
-            //reload the clip when wepaon is selected          
-            int chargeInClip = Mathf.Min(ammoRemaining, clipSize);
-            m_ClipContent += chargeInClip;        
-            if(AmmoDisplay)
-                AmmoDisplay.UpdateAmount(m_ClipContent, clipSize);        
-            //m_Owner.ChangeAmmo(ammoType, -chargeInClip);       
-            WeaponInfoUI.Instance.UpdateClipInfo(this);
-        }
-        
-        m_Animator.SetTrigger("selected");
-    }
-
+    // 총 발사
     public void Fire()
     {
-        if (m_CurrentState != WeaponState.Idle || m_ShotTimer > 0 || m_ClipContent == 0)
+        if (m_CurrentState != WeaponState.Idle || m_ShotTimer > 0 || currentAmmoCount == 0)
             return;
-        
-        m_ClipContent -= 1;
+
+        // 수정 필요 : 이후 Projectile Per Shot을 기준으로 변경해야할 수도 있음
+        currentAmmoCount -= 1;
         
         m_ShotTimer = fireRate;
-
-        if(AmmoDisplay)
-            AmmoDisplay.UpdateAmount(m_ClipContent, clipSize);
         
-        WeaponInfoUI.Instance.UpdateClipInfo(this);
+        WeaponView.Instance.UpdateAmmoCount(currentAmmoCount);
 
         //the state will only change next frame, so we set it right now.
         m_CurrentState = WeaponState.Firing;
         
-        m_Animator.SetTrigger("fire");
+        //m_Animator.SetTrigger("fire");
 
-        m_Source.pitch = Random.Range(0.7f, 1.0f);
-        m_Source.PlayOneShot(FireAudioClip);
+        // 소리
+        //m_Source.pitch = Random.Range(0.7f, 1.0f);
+        //m_Source.PlayOneShot(FireAudioClip);
         
         CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
 
+        // 발사 
         if (weaponType == WeaponType.Raycast)
         {
             for (int i = 0; i < advancedSettings.projectilePerShot; ++i)
@@ -239,7 +196,7 @@ public class Weapon : MonoBehaviour
     }
 
 
-    void RaycastShot()
+    private void RaycastShot()
     {
 
         //compute the ratio of our spread angle over the fov to know in viewport space what is the possible offset from center
@@ -271,23 +228,24 @@ public class Weapon : MonoBehaviour
         }
 
 
-        if (PrefabRayTrail != null)
-        {
-            //var pos = new Vector3[] { GetCorrectedMuzzlePlace(), hitPosition };
-            var pos = new Vector3[] { transform.position, hitPosition };
-            var trail = PoolSystem.Instance.GetInstance<LineRenderer>(PrefabRayTrail);
-            trail.gameObject.SetActive(true);
-            trail.SetPositions(pos);
-            m_ActiveTrails.Add(new ActiveTrail()
-            {
-                remainingTime = 0.3f,
-                direction = (pos[1] - pos[0]).normalized,
-                renderer = trail
-            });
-        }
+        // VFX : 이후 적용
+        //if (PrefabRayTrail != null)
+        //{
+        //    //var pos = new Vector3[] { GetCorrectedMuzzlePlace(), hitPosition };
+        //    var pos = new Vector3[] { transform.position, hitPosition };
+        //    var trail = PoolSystem.Instance.GetInstance<LineRenderer>(PrefabRayTrail);
+        //    trail.gameObject.SetActive(true);
+        //    trail.SetPositions(pos);
+        //    m_ActiveTrails.Add(new ActiveTrail()
+        //    {
+        //        remainingTime = 0.3f,
+        //        direction = (pos[1] - pos[0]).normalized,
+        //        renderer = trail
+        //    });
+        //}
     }
 
-    void ProjectileShot()
+    private void ProjectileShot()
     {
         for (int i = 0; i < advancedSettings.projectilePerShot; ++i)
         {
@@ -305,107 +263,91 @@ public class Weapon : MonoBehaviour
     }
 
     //For optimization, when a projectile is "destroyed" it is instead disabled and return to the weapon for reuse.
-    public void ReturnProjecticle(Projectile p)
+    public void ReturnProjectile(Projectile p)
     {
         m_ProjectilePool.Enqueue(p);
     }
 
     public void Reload()
     {
-        if (m_CurrentState != WeaponState.Idle || m_ClipContent == clipSize)
+        if (m_CurrentState != WeaponState.Idle || currentAmmoCount == clipSize)
             return;
 
-        int remainingBullet = currentBulletCount;
+        // SFX : 나중에 넣기
+        //if (ReloadAudioClip != null)
+        //{
+        //    m_Source.pitch = Random.Range(0.7f, 1.0f);
+        //    m_Source.PlayOneShot(ReloadAudioClip);
+        //}
 
-        if (remainingBullet == 0)
-        {
-            //No more bullet, so we disable the gun so it's displayed on empty (useful e.g. for  grenade)
-            if(DisabledOnEmpty)
-                gameObject.SetActive(false);
-            return;
-        }
-
-
-        if (ReloadAudioClip != null)
-        {
-            m_Source.pitch = Random.Range(0.7f, 1.0f);
-            m_Source.PlayOneShot(ReloadAudioClip);
-        }
-
-        int chargeInClip = Mathf.Min(remainingBullet, clipSize - m_ClipContent);
-     
         //the state will only change next frame, so we set it right now.
         m_CurrentState = WeaponState.Reloading;
         
-        m_ClipContent += chargeInClip;
+        //m_ClipContent += chargeInClip;
         
-        if(AmmoDisplay)
-            AmmoDisplay.UpdateAmount(m_ClipContent, clipSize);
+        //m_Animator.SetTrigger("reload");
         
-        m_Animator.SetTrigger("reload");
-        
-        //m_Owner.ChangeAmmo(ammoType, -chargeInClip);
-        
-        WeaponInfoUI.Instance.UpdateClipInfo(this);
+        WeaponView.Instance.UpdateClipInfo(this);
     }
 
     void Update()
     {
-        //UpdateControllerState();        
-        
-        if (m_ShotTimer > 0)
-            m_ShotTimer -= Time.deltaTime;
+        UpdateWeaponState();
 
-        Vector3[] pos = new Vector3[2];
-        for (int i = 0; i < m_ActiveTrails.Count; ++i)
-        {
-            var activeTrail = m_ActiveTrails[i];
+        //Vector3[] pos = new Vector3[2];
+        //for (int i = 0; i < m_ActiveTrails.Count; ++i)
+        //{
+        //    var activeTrail = m_ActiveTrails[i];
             
-            activeTrail.renderer.GetPositions(pos);
-            activeTrail.remainingTime -= Time.deltaTime;
+        //    activeTrail.renderer.GetPositions(pos);
+        //    activeTrail.remainingTime -= Time.deltaTime;
 
-            pos[0] += activeTrail.direction * 50.0f * Time.deltaTime;
-            pos[1] += activeTrail.direction * 50.0f * Time.deltaTime;
+        //    pos[0] += activeTrail.direction * 50.0f * Time.deltaTime;
+        //    pos[1] += activeTrail.direction * 50.0f * Time.deltaTime;
             
-            m_ActiveTrails[i].renderer.SetPositions(pos);
+        //    m_ActiveTrails[i].renderer.SetPositions(pos);
             
-            if (m_ActiveTrails[i].remainingTime <= 0.0f)
-            {
-                m_ActiveTrails[i].renderer.gameObject.SetActive(false);
-                m_ActiveTrails.RemoveAt(i);
-                i--;
-            }
-        }
+        //    if (m_ActiveTrails[i].remainingTime <= 0.0f)
+        //    {
+        //        m_ActiveTrails[i].renderer.gameObject.SetActive(false);
+        //        m_ActiveTrails.RemoveAt(i);
+        //        i--;
+        //    }
+        //}
     }
 
-    void UpdateControllerState()
+    void UpdateWeaponState()
     {
         //m_Animator.SetFloat("speed", m_Owner.Speed);
         //m_Animator.SetBool("grounded", m_Owner.Grounded);
-        
-        var info = m_Animator.GetCurrentAnimatorStateInfo(0);
+
+        //var info = m_Animator.GetCurrentAnimatorStateInfo(0);
 
         WeaponState newState;
-        if (info.shortNameHash == fireNameHash)
-            newState = WeaponState.Firing;
-        else if (info.shortNameHash == reloadNameHash)
-            newState = WeaponState.Reloading;
-        else
+        if (m_CurrentState == WeaponState.Firing &&  m_ShotTimer <= 0)
+        {
             newState = WeaponState.Idle;
+        }
+        if (m_CurrentState == WeaponState.Reloading && currentReloadTime <= 0)
+        {
+            newState = WeaponState.Idle;
+        }
+        newState = CurrentState;
 
         if (newState != m_CurrentState)
         {
             var oldState = m_CurrentState;
             m_CurrentState = newState;
-            
+
             if (oldState == WeaponState.Firing)
-            {//we just finished firing, so check if we need to auto reload
-                if(m_ClipContent == 0)
+            {
+                //we just finished firing, so check if we need to auto reload
+                if (currentAmmoCount == 0)
                     Reload();
             }
         }
 
-        if (triggerDown)
+        if (TriggerDown)
         {
             if (triggerType == TriggerType.Manual)
             {
@@ -417,6 +359,13 @@ public class Weapon : MonoBehaviour
             }
             else
                 Fire();
+        }
+
+        if (m_ShotTimer > 0)
+            m_ShotTimer -= Time.deltaTime;
+        if (currentReloadTime > 0)
+        {
+            currentReloadTime -= Time.deltaTime;
         }
     }
 }

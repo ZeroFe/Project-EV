@@ -12,6 +12,7 @@ using UnityEngine;
 /// 정체 Window를 관리아는 클래스로, 모든 Window는 이 클래스를 거쳐서 켜야한다
 /// ESC로 윈도우를 끄거나 커서를 보이게 하는 등의 관리를 한다
 /// </summary>
+[DisallowMultipleComponent]
 public class WindowSystem : Singleton<WindowSystem>
 {
     class WindowClass
@@ -32,6 +33,7 @@ public class WindowSystem : Singleton<WindowSystem>
 
     void Start()
     {
+        Debug.Log("Window System Actived");
         // 게임 시작 시 윈도우는 전부 비활성화 상태이므로 커서를 안 보여줘야 한다
         SetCursorDisplay(false);
     }

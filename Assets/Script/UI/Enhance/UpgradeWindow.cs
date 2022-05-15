@@ -3,18 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UpgradeWindow : Singleton<UpgradeWindow>
+[DisallowMultipleComponent]
+public class UpgradeWindow : MonoBehaviour
 {
+    public static UpgradeWindow Instance { get; private set; }
+
     [SerializeField] private List<UpgradeEnhanceView> upgradeEnhanceViews;
 
     public void Awake()
+    {
+        Debug.Log("Upgrade Window Init");
+        Instance = this;
+    }
+
+    public void Start()
     {
         for (int i = 0; i < upgradeEnhanceViews.Count; i++)
         {
             upgradeEnhanceViews[i].SelectEnhanceHandler = SelectEnhance;
         }
     }
-    
+
     public void SetUpgradeWindow(List<Enhance> enhances)
     {
         foreach (var enhance in enhances)
@@ -27,7 +36,7 @@ public class UpgradeWindow : Singleton<UpgradeWindow>
     private void SetUpgradeViews(List<Enhance> enhances)
     {
         int count = enhances.Count;
-        Debug.Assert(count > upgradeEnhanceViews.Count);
+        Debug.Assert(count <= upgradeEnhanceViews.Count);
 
         for (int i = 0; i < count; i++)
         {

@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
 
 public class PlayerCtrl : MonoBehaviour
 {
@@ -18,52 +16,65 @@ public class PlayerCtrl : MonoBehaviour
     [SerializeField] private float dashSpeed = 10.0f;
     [SerializeField] private AnimationCurve DashSpeedCurve;
     [SerializeField] private int maxDashCount = 2;
-    private float currDashSpeed = 0.0f;
+    private float currentDashSpeed = 0.0f;
     private bool isDashing = false;
-    private int currDashCount = 1;
-    private float currDashCooldown = 3.0f;
+    private int currentDashCount = 1;
+    private float currentDashCooldown = 3.0f;
     private float maxDashCooldown = 3.0f;
 
-    // Jump
+    [Header("Jump")]
     [SerializeField] private float jumpPower = 7.0f;
     private bool isJumping = false;
     private float gravity = -20.0f;
     private float yVelocity = 0.0f;
 
+    [Header("Rotation")]
+    public float rotationSpeed = 200.0f;
+    [SerializeField, Tooltip("How far in degrees can you move the camera up")]
+    private float topClamp = 90.0f;
+    [SerializeField, Tooltip("How far in degrees can you move the camera down")]
+    private float bottomClamp = -90.0f;
+    private float rx = 0.0f;
+    private float ry = 0.0f;
+    private Camera _main;
+
+    [Header("Attack")] 
+    [SerializeField] private Weapon weapon;
+    public Weapon PlayerWeapon => weapon;
+
+    // other
     private CharacterController cc;
 
     private float horizontalInput;
     private float verticalInput;
 
-    #region Rotate
-    private float rx = 0.0f;
-    private float ry = 0.0f;
-
-    public float rotationSpeed = 200.0f;
-    #endregion
-
+    // Action
     public event Action onJump;
     public event Action onDash;
-
-    #region Init
+    public event Action onDashEnd;
+    
     private void Awake()
     {
         cc = GetComponent<CharacterController>();
+        _main = Camera.main;
     }
 
     private void Start()
     {
+        weapon.PickedUp(this);
         StartCoroutine(RecoverDashCooldown());
     }
-
-    #endregion
 
     #region Movement
     // Update is called once per frame
     void Update()
     {
-        Rotate();
         Move();
+    }
+
+    private void LateUpdate()
+    {
+        Rotate();
     }
 
     private void Rotate()
@@ -74,11 +85,19 @@ public class PlayerCtrl : MonoBehaviour
         // 회전 값으로 사용
         ry += mx * Time.deltaTime * rotationSpeed;
         rx -= my * Time.deltaTime * rotationSpeed;
-        rx = Mathf.Clamp(rx, -90.0f, 90.0f);
+        rx = Mathf.Clamp(rx, bottomClamp, topClamp);
 
         transform.rotation = Quaternion.AngleAxis(ry, Vector3.up);
-        Camera.main.transform.localRotation = Quaternion.AngleAxis(rx, Vector3.right);
+        _main.transform.localRotation = Quaternion.AngleAxis(rx, Vector3.right);
     }
+
+
+    //private void GroundedCheck()
+    //{
+    //    // set sphere position, with offset
+    //    Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
+    //    Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+    //}
 
     private void Move()
     {
@@ -93,7 +112,7 @@ public class PlayerCtrl : MonoBehaviour
 
         CheckDash();
 
-        finalSpeed = currDashSpeed + moveSpeed;
+        finalSpeed = currentDashSpeed + moveSpeed;
 
         Jump();
 
@@ -128,9 +147,9 @@ public class PlayerCtrl : MonoBehaviour
         {
             Debug.Log("LShift");
             // Dash 키 누름
-            if (!isDashing && currDashCount > 0)
+            if (!isDashing && currentDashCount > 0)
             {
-                currDashCount--;
+                currentDashCount--;
                 StartCoroutine(Dash());
             }
         }
@@ -140,16 +159,17 @@ public class PlayerCtrl : MonoBehaviour
     {
         isDashing = true;
         // 대쉬 동작
-        currDashSpeed = dashSpeed;
+        currentDashSpeed = dashSpeed;
         float currTime = 0.0f;
-        while (currDashSpeed > 0)
+        while (currentDashSpeed > 0)
         {
             currTime += Time.fixedDeltaTime;
-            currDashSpeed = DashSpeedCurve.Evaluate(currTime) * dashSpeed;
+            currentDashSpeed = DashSpeedCurve.Evaluate(currTime) * dashSpeed;
             yield return new WaitForFixedUpdate();
         }
-        currDashSpeed = 0.0f;
+        currentDashSpeed = 0.0f;
         isDashing = false;
+        onDashEnd?.Invoke();
     }
 
     IEnumerator RecoverDashCooldown()
@@ -157,15 +177,15 @@ public class PlayerCtrl : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(cooldownTime);
-            if (currDashCount != maxDashCount)
+            if (currentDashCount != maxDashCount)
             {
-                currDashCooldown -= cooldownTime;
+                currentDashCooldown -= cooldownTime;
                 // 갱신 알림!
-                if (currDashCooldown <= 0.0f)
+                if (currentDashCooldown <= 0.0f)
                 {
-                    currDashCount++;
+                    currentDashCount++;
                     // 꽉 찼으면 DashCooldown 안 돌리고, 안 꽉찼으면 다시 max부터 시작
-                    currDashCooldown = maxDashCooldown;
+                    currentDashCooldown = maxDashCooldown;
                 }
             }
         }
@@ -174,23 +194,7 @@ public class PlayerCtrl : MonoBehaviour
 
     #region Weapon Management
 
-    void PickupWeapon(Weapon prefab)
-    {
-        //var w = Instantiate(prefab, WeaponPosition, false);
-        //w.name = prefab.name;
-        //w.transform.localPosition = Vector3.zero;
-        //w.transform.localRotation = Quaternion.identity;
-        //w.gameObject.SetActive(false);
-
-        //w.PickedUp(this);
-
-        //m_Weapons.Add(w);
-    }
-
-    void ChangeWeapon()
-    {
-
-    }
+    //void 
 
     void Reload()
     {

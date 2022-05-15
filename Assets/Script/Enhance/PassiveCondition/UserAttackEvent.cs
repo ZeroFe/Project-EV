@@ -11,7 +11,6 @@ public class UserAttackEvent : PassiveCondition
     public override void Register(GameObject target)
     {
         // Test Code : 유저 행동 클래스가 있다고 가정하고 제작
-        target.GetComponent<TestPlayer>().onJump += Execute;
     }
 
     private void Execute()

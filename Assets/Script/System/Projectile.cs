@@ -68,7 +68,7 @@ public class Projectile : MonoBehaviour
         gameObject.SetActive(false);
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
-        m_Owner.ReturnProjecticle(this);
+        m_Owner.ReturnProjectile(this);
 
         // 소리 출력
         var source = WorldAudioPool.GetWorldSFXSource();

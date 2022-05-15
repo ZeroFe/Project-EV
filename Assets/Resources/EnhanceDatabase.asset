@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f087e6b7f31fc674c932a5243c53ab40, type: 3}
   m_Name: EnhanceDatabase
   m_EditorClassIdentifier: 
-  enhances: []
+  enhances:
+  - {fileID: 11400000, guid: 04dd2a4cfdb598c47b3d29a2f5654837, type: 2}
+  - {fileID: 11400000, guid: 5ae8fa921661a604f86b48dc730e3ca2, type: 2}
+  - {fileID: 11400000, guid: cfabb559812c1354394de1a4460a319b, type: 2}
+  - {fileID: 11400000, guid: a73875d51083af241afff6dd82c8d4b7, type: 2}

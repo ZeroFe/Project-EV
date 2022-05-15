@@ -33,7 +33,7 @@ public class EnhanceSystem : Singleton<EnhanceSystem>
         player = GameObject.Find("Player");
         Debug.Assert(player, "Player not be set in Enhance Manager");
 
-        playerInventory = GetComponent<Inventory>();
+        playerInventory = player.GetComponent<Inventory>();
     }
 
     public void Start()

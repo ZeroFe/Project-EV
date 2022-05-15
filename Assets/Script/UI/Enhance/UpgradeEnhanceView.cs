@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
-public class UpgradeEnhanceView : Singleton<UpgradeEnhanceView>
+public class UpgradeEnhanceView : MonoBehaviour, 
+    IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
     // UI
     [SerializeField] private Image thumbnail;
@@ -22,17 +24,17 @@ public class UpgradeEnhanceView : Singleton<UpgradeEnhanceView>
         selectOutline.enabled = false;
     }
 
-    private void OnMouseEnter()
+    public void OnPointerEnter(PointerEventData eventData)
     {
         selectOutline.enabled = true;
     }
 
-    private void OnMouseExit()
+    public void OnPointerExit(PointerEventData eventData)
     {
         selectOutline.enabled = false;
     }
 
-    private void OnMouseDown()
+    public void OnPointerDown(PointerEventData eventData)
     {
         Debug.Log("Mouse Down");
         // 상위 ui에게 알린다

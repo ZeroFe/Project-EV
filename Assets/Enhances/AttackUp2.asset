@@ -10,12 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 327ede242aa355b4b99313ef188d7fe7, type: 3}
-  m_Name: AttackUp
+  m_Name: AttackUp2
   m_EditorClassIdentifier: 
-  codeName: ATTACK_UP
+  codeName: ATTACK_UP_2
   icon: {fileID: 0}
   description: 
   prerequisites: []
   passiveCondition: {fileID: 11400000, guid: 1c7c629f69c29cb4fa778ff2b86249f9, type: 2}
-  passiveEffect:
-  - reference: {fileID: 0}
+  passiveEffect: []
