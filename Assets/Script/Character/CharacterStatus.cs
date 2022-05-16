@@ -14,8 +14,8 @@ public class CharacterStatus : MonoBehaviour
     public HpBar hpBar;
 
     [SerializeField]
-    private int maxHp = 100;
-    private int _currentHp = 100;
+    protected int maxHp = 100;
+    protected int _currentHp = 100;
 
     public int CurrentHp
     {
@@ -26,6 +26,7 @@ public class CharacterStatus : MonoBehaviour
             if (_currentHp <= 0)
             {
                 _currentHp = 0;
+                onDead?.Invoke();
             }
             else if (_currentHp > maxHp)
             {
@@ -36,6 +37,9 @@ public class CharacterStatus : MonoBehaviour
     }
 
     public event HpChangedHandler onHpChanged;
+    public event Action onDead;
+    public event Action<int> onDamaged;
+    public event Action<int> onHealed;
 
     // Start is called before the first frame update
     void Start()
@@ -43,19 +47,20 @@ public class CharacterStatus : MonoBehaviour
         onHpChanged += hpBar.DrawHp;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            Debug.Log("HP Restore");
-            CurrentHp += 10;
-        }
 
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            Debug.Log("HP Lost");
-            CurrentHp -= 10;
-        }
+    }
+
+    public void TakeDamage(int amount)
+    {
+        CurrentHp -= amount;
+        onDamaged?.Invoke(amount);
+    }
+
+    public void TakeHeal(int amount)
+    {
+        CurrentHp += amount;
+        onHealed?.Invoke(amount);
     }
 }

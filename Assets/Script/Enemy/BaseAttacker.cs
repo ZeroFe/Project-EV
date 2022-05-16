@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BaseAttacker : MonoBehaviour
+public class BaseAttacker : EnemyFSM
 {
     enum EnemyState
     {
@@ -17,17 +17,12 @@ public class BaseAttacker : MonoBehaviour
 
     private EnemyState m_State;
 
-    Transform targetTr;
-
     public float attackDistance = 2f;
     float currentTime = 0;
     float attackDelay = 2f;
     public int attackPower = 3;
 
     public int hp = 15;
-
-    private NavMeshAgent agent;
-    private CharacterController cc;
 
     private void Awake()
     {
