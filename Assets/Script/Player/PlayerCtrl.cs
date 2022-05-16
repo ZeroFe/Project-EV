@@ -108,7 +108,7 @@ public class PlayerCtrl : MonoBehaviour
         dir = dir.normalized;
 
         // 2-1. 메인 카메라를 기준으로 방향을 변환한다.
-        dir = Camera.main.transform.TransformDirection(dir);
+        dir = _main.transform.TransformDirection(dir);
 
         CheckDash();
 
@@ -158,15 +158,16 @@ public class PlayerCtrl : MonoBehaviour
     IEnumerator Dash()
     {
         isDashing = true;
-        // 대쉬 동작
         currentDashSpeed = dashSpeed;
+
         float currTime = 0.0f;
-        while (currentDashSpeed > 0)
+        while (currentDashSpeed > 0.1f)
         {
             currTime += Time.fixedDeltaTime;
             currentDashSpeed = DashSpeedCurve.Evaluate(currTime) * dashSpeed;
             yield return new WaitForFixedUpdate();
         }
+
         currentDashSpeed = 0.0f;
         isDashing = false;
         onDashEnd?.Invoke();
