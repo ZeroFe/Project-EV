@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 캐릭터 능력치 클래스
@@ -11,7 +12,7 @@ public class CharacterStatus : MonoBehaviour
 {
     public delegate void HpChangedHandler(int current, int max);
 
-    public HpBar hpBar;
+    [FormerlySerializedAs("hpBar")] public SimpleHpBar simpleHpBar;
 
     [SerializeField]
     protected int maxHp = 100;
@@ -44,7 +45,7 @@ public class CharacterStatus : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        onHpChanged += hpBar.DrawHp;
+        onHpChanged += simpleHpBar.DrawHp;
     }
 
     void Update()

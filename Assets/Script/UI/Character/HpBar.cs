@@ -1,18 +1,49 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-using TMPro;
 
 public class HpBar : MonoBehaviour
 {
-    public Slider hpSlider;
-    public TMP_Text hpText;
+    public static readonly float ANIMATE_TIME = 0.025f;
 
-    public void DrawHp(int current, int max)
+    [Header("Component")]
+    [SerializeField] private Image fillHp;
+    [SerializeField] private Image changedHp;
+
+    [Header("Animation")]
+    [SerializeField] private float animationTime = 0.05f;
+    [SerializeField] private float changedPerSecond = 0.2f;
+    private float changedPerLoop;
+
+    private void Awake()
     {
-        float hpPercent = (float)current / max;
-        hpSlider.value = hpPercent;
-        hpText.text = $"{current} / {max}";
+        Debug.Assert(fillHp);
+        Debug.Assert(changedHp);
+    }
+
+    public void Start()
+    {
+        changedPerLoop = changedPerSecond * ANIMATE_TIME;
+        StartCoroutine(HpChangeAnimate());
+    }
+
+    public void Changed(float percent)
+    {
+        fillHp.fillAmount = percent;
+    }
+
+    IEnumerator HpChangeAnimate()
+    {
+        while (true)
+        {
+            if (fillHp.fillAmount < changedHp.fillAmount)
+            {
+                changedHp.fillAmount = Mathf.Max(changedHp.fillAmount - changedPerLoop, fillHp.fillAmount);
+            }
+            yield return new WaitForSeconds(ANIMATE_TIME);
+        }
     }
 }
