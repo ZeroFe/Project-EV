@@ -62,7 +62,7 @@ public class Projectile : MonoBehaviour
             // TODO : UseEffect 주기
             //Target t = s_SphereCastPool[i].GetComponent<Target>();
             
-            //t.Got(damage);
+            //t.Got(attackPower);
         }
         
         gameObject.SetActive(false);
