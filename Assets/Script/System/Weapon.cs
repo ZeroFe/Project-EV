@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -71,6 +74,8 @@ public class Weapon : MonoBehaviour
     public Projectile projectilePrefab;
     public float projectileLaunchForce = 200.0f;
 
+    public GameObject bulletEffectPrefab;
+
     public AdvancedSettings advancedSettings;
 
     // 그 외
@@ -84,6 +89,16 @@ public class Weapon : MonoBehaviour
         { 
             m_TriggerDown = value;
             if (!m_TriggerDown) m_ShotDone = false;
+        }
+    }
+
+    public int CurrentAmmoCount
+    {
+        get { return currentAmmoCount; }
+        private set
+        {
+            currentAmmoCount = value;
+            WeaponView.Instance.UpdateAmmoCount(currentAmmoCount);
         }
     }
 
@@ -144,31 +159,23 @@ public class Weapon : MonoBehaviour
         owner = c;
     }
 
-    public void PutAway()
+    private void Start()
     {
-        //m_Animator.WriteDefaultValues();
-        
-        //for (int i = 0; i < m_ActiveTrails.Count; ++i)
-        //{
-        //    var activeTrail = m_ActiveTrails[i];
-        //    m_ActiveTrails[i].renderer.gameObject.SetActive(false);
-        //}
-        
-        //m_ActiveTrails.Clear();
+        WeaponView.Instance.UpdateClipInfo(this);
+        WeaponView.Instance.UpdateAmmoCount(CurrentAmmoCount);
     }
 
     // 총 발사
     public void Fire()
     {
+        Debug.Log("Weapon Fire");
         if (m_CurrentState != WeaponState.Idle || m_ShotTimer > 0 || currentAmmoCount == 0)
             return;
 
         // 수정 필요 : 이후 Projectile Per Shot을 기준으로 변경해야할 수도 있음
-        currentAmmoCount -= 1;
+        CurrentAmmoCount -= 1;
         
         m_ShotTimer = fireRate;
-        
-        WeaponView.Instance.UpdateAmmoCount(currentAmmoCount);
 
         //the state will only change next frame, so we set it right now.
         m_CurrentState = WeaponState.Firing;
@@ -179,7 +186,7 @@ public class Weapon : MonoBehaviour
         //m_Source.pitch = Random.Range(0.7f, 1.0f);
         //m_Source.PlayOneShot(FireAudioClip);
         
-        CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
+        //CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
 
         // 발사 
         if (weaponType == WeaponType.Raycast)
@@ -212,21 +219,22 @@ public class Weapon : MonoBehaviour
         if (Physics.Raycast(r, out hit, 1000.0f, ~(1 << 9), QueryTriggerInteraction.Ignore))
         {
             Renderer renderer = hit.collider.GetComponentInChildren<Renderer>();
-            ImpactManager.Instance.PlayImpact(hit.point, hit.normal, renderer == null ? null : renderer.sharedMaterial);
+            //ImpactManager.Instance.PlayImpact(hit.point, hit.normal, renderer == null ? null : renderer.sharedMaterial);
+            Instantiate(bulletEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
 
             //if too close, the trail effect would look weird if it arced to hit the wall, so only correct it if far
             if (hit.distance > 5.0f)
                 hitPosition = hit.point;
             
             //this is a target
-            if (hit.collider.gameObject.layer == 10)
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 // TODO : UseEffect 주기
+                
                 //Target target = hit.collider.gameObject.GetComponent<Target>();
-                //target.Got(damage);
+                //target.Got(attackPower);
             }
         }
-
 
         // VFX : 이후 적용
         //if (PrefabRayTrail != null)
@@ -282,12 +290,12 @@ public class Weapon : MonoBehaviour
 
         //the state will only change next frame, so we set it right now.
         m_CurrentState = WeaponState.Reloading;
-        
-        //m_ClipContent += chargeInClip;
-        
+
+        CurrentAmmoCount = clipSize;
+
+        currentReloadTime = reloadTime;
+
         //m_Animator.SetTrigger("reload");
-        
-        WeaponView.Instance.UpdateClipInfo(this);
     }
 
     void Update()
@@ -323,28 +331,20 @@ public class Weapon : MonoBehaviour
 
         //var info = m_Animator.GetCurrentAnimatorStateInfo(0);
 
-        WeaponState newState;
         if (m_CurrentState == WeaponState.Firing &&  m_ShotTimer <= 0)
         {
-            newState = WeaponState.Idle;
+            Debug.Log("To Idle");
+            m_CurrentState = WeaponState.Idle;
         }
-        if (m_CurrentState == WeaponState.Reloading && currentReloadTime <= 0)
+        else if (m_CurrentState == WeaponState.Reloading && currentReloadTime <= 0)
         {
-            newState = WeaponState.Idle;
+            m_CurrentState = WeaponState.Idle;
         }
-        newState = CurrentState;
 
-        if (newState != m_CurrentState)
+        if (CurrentState == WeaponState.Idle)
         {
-            var oldState = m_CurrentState;
-            m_CurrentState = newState;
-
-            if (oldState == WeaponState.Firing)
-            {
-                //we just finished firing, so check if we need to auto reload
-                if (currentAmmoCount == 0)
-                    Reload();
-            }
+            if (currentAmmoCount == 0)
+                Reload();
         }
 
         if (TriggerDown)
@@ -362,7 +362,10 @@ public class Weapon : MonoBehaviour
         }
 
         if (m_ShotTimer > 0)
+        {
             m_ShotTimer -= Time.deltaTime;
+        }
+
         if (currentReloadTime > 0)
         {
             currentReloadTime -= Time.deltaTime;

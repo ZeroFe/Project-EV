@@ -20,20 +20,6 @@ public class BaseAttacker : EnemyFSM
     public float attackDistance = 2f;
     float currentTime = 0;
     float attackDelay = 2f;
-    public int attackPower = 3;
-
-    public int hp = 15;
-
-    private void Awake()
-    {
-        cc = GetComponent<CharacterController>();
-        agent = GetComponent<NavMeshAgent>();
-    }
-
-    public void SetTarget(Transform target)
-    {
-        targetTr = target;
-    }
 
     void Start()
     {
@@ -41,7 +27,6 @@ public class BaseAttacker : EnemyFSM
         m_State = EnemyState.Idle;
 
         // 자식 오브젝트로부터 애니메이터 변수 받아오기
-        //anim = transform.GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -65,9 +50,6 @@ public class BaseAttacker : EnemyFSM
                 //Die();
                 break;
         }
-
-        // 현재 hp(%)를 hp 슬라이더의 value에 반영한다.
-        //hpSlider.value = (float)hp / (float)maxHp;
     }
 
     void Idle()
@@ -117,7 +99,7 @@ public class BaseAttacker : EnemyFSM
             currentTime += Time.deltaTime;
             if (currentTime > attackDelay)
             {
-                // player.GetComponent<PlayerMove>().DamageAction(attackPower);
+                AttackAction();
                 print("공격");
                 currentTime = 0;
 
@@ -140,7 +122,7 @@ public class BaseAttacker : EnemyFSM
     // 플레이어의 스크립트의 데미지 처리 함수를 실행하기
     public void AttackAction()
     {
-        //player.GetComponent<PlayerCtrl>().DamageAction(attackPower);
+        target.GetComponent<CharacterStatus>().TakeDamage(status.attackPower);
     }
 
     // 데미지 실행 함수
@@ -152,15 +134,12 @@ public class BaseAttacker : EnemyFSM
             return;
         }
 
-        // 플레이어의 공격력만큼 에너미의 체력을 감소시킨다.
-        //hp -= hitPower;
-
         // 네비게이션 에이전트의 이동을 멈추고 경로를 초기화한다.
         agent.isStopped = true;
         agent.ResetPath();
 
         // 에너미의 체력이 0보다 크면 피격 상태로 전환한다.
-        if (hp > 0)
+        if (status.CurrentHp > 0)
         {
             m_State = EnemyState.Damaged;
             print("상태 전환: Any state -> Damaged");

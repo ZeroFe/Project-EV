@@ -26,6 +26,13 @@ public class RoundSystem : Singleton<RoundSystem>
     private int MaxRound = 10;
     private int currentRound = 0;
 
+    [Header("Enemy Prefab")] 
+    [SerializeField]
+    private GameObject[] enemyPrefabs;
+
+    [SerializeField]
+    private Transform spawnTr;
+
     [Header("UI")]
     public GameObject GameClearUI;
 
@@ -105,6 +112,10 @@ public class RoundSystem : Singleton<RoundSystem>
     {
         // 중간 중간 설정한 몬스터가 나와야 한다
         Debug.Log("Monster Spawn!!!");
+        int randNum = UnityEngine.Random.Range(0, enemyPrefabs.Length);
+        var go = Instantiate(enemyPrefabs[randNum]);
+        EnemyManager.Instance.SetEnemyTarget(go);
+        go.transform.position = spawnTr.position;
         currentEnemyCount++;
     }
 
@@ -112,7 +123,7 @@ public class RoundSystem : Singleton<RoundSystem>
 
     private void DebugExecute()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.Y))
         {
             CheckRoundEnd();
         }

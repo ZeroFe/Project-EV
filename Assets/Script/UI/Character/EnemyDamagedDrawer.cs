@@ -17,6 +17,9 @@ public class EnemyDamagedDrawer : MonoBehaviour
 
     private float _gravity = 3.0f;
     private float _lifeTime = 2.0f;
+    private float _bonusUpVelocity = 3.0f;
+
+    private float _initRange = 1.0f;
 
     private void Start()
     {
@@ -30,7 +33,12 @@ public class EnemyDamagedDrawer : MonoBehaviour
 
     public void SetDrawInfo(int damage, Color color, Vector3 position)
     {
-        //SetDrawInfo(damage, color, );
+        Vector3 initVec = new Vector3(
+            UnityEngine.Random.Range(-_initRange, _initRange),
+            UnityEngine.Random.Range(-_initRange, _initRange) + _bonusUpVelocity,
+            UnityEngine.Random.Range(-_initRange, _initRange)
+            );
+        SetDrawInfo(damage, color, position, initVec, _gravity, _lifeTime);
     }
 
     public void SetDrawInfo(int damage, Color color, Vector3 position, 

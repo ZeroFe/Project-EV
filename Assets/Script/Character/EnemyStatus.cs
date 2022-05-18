@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 
@@ -10,9 +11,12 @@ public class EnemyStatus : CharacterStatus
 {
     //public delegate void Damage
 
+    [FormerlySerializedAs("damage")] public int attackPower = 3;
+
     private void OnEnable()
     {
         //EnemyManager.Instance
+        Init();
     }
 
     /// <summary>
@@ -21,7 +25,7 @@ public class EnemyStatus : CharacterStatus
     /// </summary>
     private void Init()
     {
-
+        CurrentHp = maxHp;
     }
 
     // Start is called before the first frame update

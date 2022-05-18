@@ -70,11 +70,12 @@ public class PlayerCtrl : MonoBehaviour
     void Update()
     {
         Move();
+        Fire();
     }
 
     private void LateUpdate()
     {
-        Rotate();
+        //Rotate();
     }
 
     private void Rotate()
@@ -195,7 +196,14 @@ public class PlayerCtrl : MonoBehaviour
 
     #region Weapon Management
 
-    //void 
+    void Fire()
+    {
+        weapon.TriggerDown = Input.GetButton("Fire");
+        if (Input.GetButtonDown("Fire"))
+        {
+            weapon.Fire();
+        }
+    }
 
     void Reload()
     {
