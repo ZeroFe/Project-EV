@@ -9,6 +9,8 @@ public class HpBar : MonoBehaviour
 {
     public static readonly float ANIMATE_TIME = 0.025f;
 
+    public CharacterStatus targetStatus;
+
     [Header("Component")]
     [SerializeField] private Image fillHp;
     [SerializeField] private Image changedHp;
@@ -20,12 +22,16 @@ public class HpBar : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Assert(targetStatus);
+
         Debug.Assert(fillHp);
         Debug.Assert(changedHp);
     }
 
     public void Start()
     {
+        targetStatus.onHpChanged += (int current, int max) => Changed((float) current / max);
+
         changedPerLoop = changedPerSecond * ANIMATE_TIME;
         StartCoroutine(HpChangeAnimate());
     }

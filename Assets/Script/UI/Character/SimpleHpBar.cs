@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,8 +7,16 @@ using TMPro;
 
 public class SimpleHpBar : MonoBehaviour
 {
+    public CharacterStatus targetStatus;
+
     public Slider hpSlider;
     public TMP_Text hpText;
+
+    private void Start()
+    {
+        Debug.Assert(targetStatus, "Error : target Status not setting");
+        targetStatus.onHpChanged += DrawHp;
+    }
 
     public void DrawHp(int current, int max)
     {

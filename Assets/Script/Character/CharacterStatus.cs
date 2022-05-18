@@ -12,8 +12,6 @@ public class CharacterStatus : MonoBehaviour
 {
     public delegate void HpChangedHandler(int current, int max);
 
-    [FormerlySerializedAs("hpBar")] public SimpleHpBar simpleHpBar;
-
     [SerializeField]
     protected int maxHp = 100;
     protected int _currentHp = 100;
@@ -41,12 +39,6 @@ public class CharacterStatus : MonoBehaviour
     public event Action onDead;
     public event Action<int> onDamaged;
     public event Action<int> onHealed;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        onHpChanged += simpleHpBar.DrawHp;
-    }
 
     void Update()
     {

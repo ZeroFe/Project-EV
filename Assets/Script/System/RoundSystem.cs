@@ -113,9 +113,8 @@ public class RoundSystem : Singleton<RoundSystem>
         // 중간 중간 설정한 몬스터가 나와야 한다
         Debug.Log("Monster Spawn!!!");
         int randNum = UnityEngine.Random.Range(0, enemyPrefabs.Length);
-        var go = Instantiate(enemyPrefabs[randNum]);
+        var go = Instantiate(enemyPrefabs[randNum], spawnTr.position, Quaternion.identity);
         EnemyManager.Instance.SetEnemyTarget(go);
-        go.transform.position = spawnTr.position;
         currentEnemyCount++;
     }
 

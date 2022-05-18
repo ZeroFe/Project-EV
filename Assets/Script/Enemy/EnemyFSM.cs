@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 
+[RequireComponent(typeof(EnemyStatus))]
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class EnemyFSM : MonoBehaviour

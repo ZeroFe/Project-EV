@@ -107,6 +107,7 @@ public class Weapon : MonoBehaviour
 
     public PlayerCtrl Owner => owner;
     private PlayerCtrl owner;
+    private PlayerStatus ownerStatus;
     private Camera _main;
     
     //Animator m_Animator;
@@ -157,6 +158,7 @@ public class Weapon : MonoBehaviour
     public void PickedUp(PlayerCtrl c)
     {
         owner = c;
+        ownerStatus = owner.GetComponent<PlayerStatus>();
     }
 
     private void Start()
@@ -168,7 +170,6 @@ public class Weapon : MonoBehaviour
     // 총 발사
     public void Fire()
     {
-        Debug.Log("Weapon Fire");
         if (m_CurrentState != WeaponState.Idle || m_ShotTimer > 0 || currentAmmoCount == 0)
             return;
 
@@ -216,7 +217,7 @@ public class Weapon : MonoBehaviour
         Ray r = Camera.main.ViewportPointToRay(Vector3.one * 0.5f + (Vector3)spread);
         Vector3 hitPosition = r.origin + r.direction * 200.0f;
         
-        if (Physics.Raycast(r, out hit, 1000.0f, ~(1 << 9), QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(r, out hit, 1000.0f, ~(1 << LayerMask.NameToLayer("Player")), QueryTriggerInteraction.Ignore))
         {
             Renderer renderer = hit.collider.GetComponentInChildren<Renderer>();
             //ImpactManager.Instance.PlayImpact(hit.point, hit.normal, renderer == null ? null : renderer.sharedMaterial);
@@ -225,12 +226,23 @@ public class Weapon : MonoBehaviour
             //if too close, the trail effect would look weird if it arced to hit the wall, so only correct it if far
             if (hit.distance > 5.0f)
                 hitPosition = hit.point;
-            
+
+            Debug.Log("Raycast shot hit");
             //this is a target
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 // TODO : UseEffect 주기
-                
+                Debug.Log($"Enemy Hit : {hit.collider.name}");
+                var targetStatus = hit.collider.gameObject.GetComponent<EnemyStatus>();
+                if (targetStatus)
+                {
+                    Debug.Log("target Status not null");
+                    targetStatus.TakeDamage((int)(ownerStatus.attackPower * damageMultiplier));
+                }
+                else
+                {
+                    Debug.Log("Error - enemy status not find");
+                }
                 //Target target = hit.collider.gameObject.GetComponent<Target>();
                 //target.Got(attackPower);
             }
