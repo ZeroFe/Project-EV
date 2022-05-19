@@ -10,33 +10,48 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Equip Enhance", menuName = "Enhance/Enhance")]
 public class Enhance : ScriptableObject
 {
+    [SerializeField] private string enhanceName;
     [SerializeField] private string codeName;
     [SerializeField] private Sprite icon = null;
-    [SerializeField] private string description = "";
+    [SerializeField, TextArea(3, 5)] 
+    private string description = "";
     // 아이템 획득을 위한 선행 조건
     public List<Enhance> prerequisites;
 
+    public string EnhanceName => enhanceName;
     public Sprite Icon => icon;
     public string CodeName => codeName;
     public string Description => description;
 
+    [Header("Ability")]
+    public EnhanceEffectReference[] abilities;
+
     [Header("Passive")]
     [SerializeField]
-    private PassiveCondition passiveCondition;
+    private PassiveConditionReference passiveCondition;
     public UseEffectReference[] passiveEffect;
 
+    private GameObject owner;
 
     public void Register(GameObject target)
     {
-        passiveCondition.Register(target);
-        passiveCondition.onSuccessCondition += UseEquipEffect;
+        if (passiveCondition == null)
+        {
+            return;
+        }
+
+        this.owner = target;
+        passiveCondition.GetReference().Register(target);
+        passiveCondition.GetReference().onSuccessCondition += UseEquipEffect;
     }
 
     private void UseEquipEffect()
     {
         foreach (var effect in passiveEffect)
         {
-            effect.GetReference().TakeUseEffect();
+            // 아이템은 내가 나에게 적용하는 것으로 판단
+            // 고로 sender와 target이 둘 다 owner이다
+            effect.GetReference().TakeUseEffect(owner, owner);
         }
     }
 

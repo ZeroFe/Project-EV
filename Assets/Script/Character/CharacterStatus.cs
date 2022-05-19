@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 
 /// <summary>
@@ -16,6 +17,8 @@ public class CharacterStatus : MonoBehaviour
     protected int maxHp = 100;
     protected int _currentHp = 100;
 
+    protected bool isDead = false;
+
     public int CurrentHp
     {
         get => _currentHp;
@@ -25,7 +28,11 @@ public class CharacterStatus : MonoBehaviour
             if (_currentHp <= 0)
             {
                 _currentHp = 0;
-                onDead?.Invoke();
+                if (!isDead)
+                {
+                    isDead = true;
+                    onDead?.Invoke();
+                }
             }
             else if (_currentHp > maxHp)
             {
@@ -35,10 +42,27 @@ public class CharacterStatus : MonoBehaviour
         }
     }
 
+    public int MaxHp
+    {
+        get => maxHp;
+        set
+        {
+            // 최대 체력이 늘어나도 체력이 증가하지 않음
+            maxHp = value;
+            Debug.Assert(maxHp > 0, "Error - Max Hp is lower than 0");
+            onHpChanged?.Invoke(_currentHp, maxHp);
+        }
+    }
+
     public event HpChangedHandler onHpChanged;
     public event Action onDead;
     public event Action<int> onDamaged;
     public event Action<int> onHealed;
+
+    private void OnEnable()
+    {
+        isDead = false;
+    }
 
     void Update()
     {

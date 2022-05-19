@@ -10,11 +10,7 @@ public abstract class UseEffect : ScriptableObject
     /// <summary>
     /// 효과를 적용하는 함수
     /// </summary>
-    public abstract void TakeUseEffect();
-
-    /// <summary></summary>
-    /// <returns>능력을 설명하는 텍스트('\n' 없음)</returns>
-    public abstract string Explain();
+    public abstract void TakeUseEffect(GameObject sender, GameObject target);
 }
 
 [System.Serializable]

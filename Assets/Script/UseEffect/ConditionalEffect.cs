@@ -17,7 +17,7 @@ public class ConditionalEffect : UseEffect
     public float StackBonusRate = 0;
     public UseEffectReference[] Effect = null;
 
-    public override string Explain()
+    public string Explain()
     {
         //"화상 3스택 상태일 때 500 데미지, 1.5초 기절";
         //string ret = $"{Condition.name} 상태일 때 ";
@@ -25,7 +25,7 @@ public class ConditionalEffect : UseEffect
         return ret;
     }
 
-    public override void TakeUseEffect()
+    public override void TakeUseEffect(GameObject sender, GameObject target)
     {
         Debug.Log($"Conditional Effect");
     }

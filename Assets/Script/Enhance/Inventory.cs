@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -27,15 +28,12 @@ public class Inventory : MonoBehaviour
 
     }
 
-    #region Add Enhance
-    // 강화 적용하기
     public bool AddItem(Enhance newEnhance)
     {
         Debug.Log($"add enhance - {newEnhance.name}");
 
         enhances.Add(newEnhance);
-        //AddEquipAbility(newEnhance);
-
+        AddEnhanceAbilities(newEnhance);
         RegisterPassive(newEnhance);
 
         //addItemEvent.Invoke(newEnhance.name.GetHashCode());
@@ -47,37 +45,12 @@ public class Inventory : MonoBehaviour
     {
         enhance.Register(gameObject);
     }
-    #endregion
 
-
-    /*
-    public int GetEquipAbilityIncreaseSize(EAbility ability)
+    private void AddEnhanceAbilities(Enhance newEnhance)
     {
-        return _equipAbilityIncreaseSizeArr[(int)ability];
-    }
-
-    /// <summary>
-    /// 장비 아이템의 합산 능력치 및 효과 갱신
-    /// </summary>
-    private void AddEquipAbility(EquipItem equip)
-    {
-        foreach (var ability in equip.equipAbilities)
+        foreach (var ability in newEnhance.abilities)
         {
-            _equipAbilityIncreaseSizeArr[(int)ability.equipEffect] += ability.value;
+            ability.GetReference().ApplyEnhance(gameObject);
         }
     }
-
-    public void AddAbility(int value, EAbility type)
-    {
-        equipAbilityIncreaseSizeArrPublic[(int)type] += value;
-    }
-
-    private void DeleteEquipAbility(EquipItem equip)
-    {
-        foreach (var ability in equip.equipAbilities)
-        {
-            _equipAbilityIncreaseSizeArr[(int)ability.equipEffect] -= ability.value;
-        }
-    }
-    */
 }

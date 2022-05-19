@@ -15,7 +15,7 @@ public class EnemyStatus : CharacterStatus
 
     private void OnEnable()
     {
-        //EnemyManager.Instance
+        onDead += RoundSystem.Instance.CheckRoundEnd;
         Init();
     }
 

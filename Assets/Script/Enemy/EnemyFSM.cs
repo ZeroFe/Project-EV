@@ -33,6 +33,11 @@ public abstract class EnemyFSM : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
+    protected void OnEnable()
+    {
+        status.onDead += Die;
+    }
+
     public void SetTarget(GameObject target)
     {
         this.target = target;
@@ -74,7 +79,7 @@ public abstract class EnemyFSM : MonoBehaviour
     }
 
     // 죽음 상태 함수
-    void Die()
+    public virtual void Die()
     {
     }
 }

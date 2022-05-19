@@ -82,25 +82,7 @@ public class Weapon : MonoBehaviour
     public Transform EndPoint;
 
     private bool m_TriggerDown;
-    public bool TriggerDown
-    {
-        get { return m_TriggerDown; }
-        set 
-        { 
-            m_TriggerDown = value;
-            if (!m_TriggerDown) m_ShotDone = false;
-        }
-    }
 
-    public int CurrentAmmoCount
-    {
-        get { return currentAmmoCount; }
-        private set
-        {
-            currentAmmoCount = value;
-            WeaponView.Instance.UpdateAmmoCount(currentAmmoCount);
-        }
-    }
 
     WeaponState m_CurrentState;
     public WeaponState CurrentState => m_CurrentState;
@@ -109,7 +91,7 @@ public class Weapon : MonoBehaviour
     private PlayerCtrl owner;
     private PlayerStatus ownerStatus;
     private Camera _main;
-    
+
     //Animator m_Animator;
 
     AudioSource m_Source;
@@ -122,13 +104,57 @@ public class Weapon : MonoBehaviour
         public Vector3 direction;
         public float remainingTime;
     }
-    
+
     List<ActiveTrail> m_ActiveTrails = new List<ActiveTrail>();
-    
+
     Queue<Projectile> m_ProjectilePool = new Queue<Projectile>();
-    
+
     int fireNameHash = Animator.StringToHash("fire");
-    int reloadNameHash = Animator.StringToHash("reload");     
+    int reloadNameHash = Animator.StringToHash("reload");
+
+    #region property
+
+    public bool TriggerDown
+    {
+        get { return m_TriggerDown; }
+        set
+        {
+            m_TriggerDown = value;
+            if (!m_TriggerDown) m_ShotDone = false;
+        }
+    }
+
+    public int CurrentAmmoCount
+    {
+        get => currentAmmoCount;
+        set
+        {
+            currentAmmoCount = Math.Clamp(value, 0, clipSize);
+            WeaponView.Instance.UpdateAmmoCount(currentAmmoCount);
+        }
+    }
+
+    public int ClipSize
+    {
+        get => clipSize;
+        set
+        {
+            clipSize = value;
+            WeaponView.Instance.UpdateClipInfo(clipSize);
+        }
+    }
+
+    public float CurrentReloadTime
+    {
+        get => currentReloadTime;
+        set
+        {
+            currentReloadTime = value;
+            WeaponView.Instance.UpdateReloadBar(currentReloadTime / reloadTime);
+        }
+    }
+
+    #endregion     
 
     void Awake()
     {
@@ -163,7 +189,7 @@ public class Weapon : MonoBehaviour
 
     private void Start()
     {
-        WeaponView.Instance.UpdateClipInfo(this);
+        WeaponView.Instance.UpdateClipInfo(ClipSize);
         WeaponView.Instance.UpdateAmmoCount(CurrentAmmoCount);
     }
 
@@ -232,19 +258,15 @@ public class Weapon : MonoBehaviour
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 // TODO : UseEffect 주기
-                Debug.Log($"Enemy Hit : {hit.collider.name}");
                 var targetStatus = hit.collider.gameObject.GetComponent<EnemyStatus>();
                 if (targetStatus)
                 {
-                    Debug.Log("target Status not null");
                     targetStatus.TakeDamage((int)(ownerStatus.attackPower * damageMultiplier));
                 }
                 else
                 {
-                    Debug.Log("Error - enemy status not find");
+                    Debug.LogError($"enemy {hit.collider.gameObject.name}'s status not find");
                 }
-                //Target target = hit.collider.gameObject.GetComponent<Target>();
-                //target.Got(attackPower);
             }
         }
 
@@ -380,7 +402,7 @@ public class Weapon : MonoBehaviour
 
         if (currentReloadTime > 0)
         {
-            currentReloadTime -= Time.deltaTime;
+            CurrentReloadTime -= Time.deltaTime;
         }
     }
 }

@@ -7,12 +7,12 @@ public class OverTimeEffect : PersistEffect
     public float Period = 1f;
     public UseEffect Effect = null;
 
-    public override void TakeUseEffect()
+    public override void TakeUseEffect(GameObject sender, GameObject target)
     {
         throw new System.NotImplementedException();
     }
 
-    public override string Explain()
+    public string Explain()
     {
         return $"Over Time : {Period}";
     }

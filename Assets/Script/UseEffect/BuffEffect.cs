@@ -16,12 +16,12 @@ public class BuffEffect : PersistEffect
     public float increaseBase = 0;
     public float increasePerStack = 0;
 
-    public override string Explain()
+    public string Explain()
     {
         return "BuffEffect!!";
     }
 
-    public override void TakeUseEffect()
+    public override void TakeUseEffect(GameObject sender, GameObject target)
     {
         throw new System.NotImplementedException();
     }

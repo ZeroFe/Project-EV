@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4275534629392587627
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1412da069d60a314295d7404d2d40742, type: 3}
+  m_Name: ShotGun_WeaponEnhance
+  m_EditorClassIdentifier: 
+  attackSpeedMultiplier: 1
+  reloadSpeedMultiplier: 1.5
+  clipSizeAdder: 0
+  clipSizeMultiplier: 0.5
+  spreadAngle: 3
+  projectilePerShot: 3
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ede242aa355b4b99313ef188d7fe7, type: 3}
+  m_Name: ShotGun
+  m_EditorClassIdentifier: 
+  enhanceName: "\uC0B0\uD0C4\uCD1D"
+  codeName: SHOT_GUN
+  icon: {fileID: 21300000, guid: 71e207a616de68440ac52226d2cfb9f7, type: 3}
+  description: "\uCD1D\uC54C\uC744 3\uBC1C\uC529 \uC3DC\uB2E4\n\uC7A5\uD0C4 \uC218\uAC00
+    \uC808\uBC18\uC73C\uB85C \uC904\uC5B4\uB4E4\uACE0, \uC7AC\uC7A5\uC804\uC774 50%
+    \uB290\uB824\uC9C4\uB2E4"
+  prerequisites: []
+  abilities:
+  - reference: {fileID: -4275534629392587627}
+  passiveCondition:
+    reference: {fileID: 0}
+  passiveEffect: []

@@ -27,6 +27,8 @@ public class BaseAttacker : EnemyFSM
         m_State = EnemyState.Idle;
 
         // 자식 오브젝트로부터 애니메이터 변수 받아오기
+
+        status.onDead += Die;
     }
 
     void Update()
@@ -178,7 +180,7 @@ public class BaseAttacker : EnemyFSM
     }
 
     // 죽음 상태 함수
-    void Die()
+    public override void Die()
     {
         // 진행중인 피격 코루틴을 중지한다.
         StopAllCoroutines();

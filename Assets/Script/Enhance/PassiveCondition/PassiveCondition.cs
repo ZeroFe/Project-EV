@@ -63,3 +63,10 @@ public abstract class PassiveCondition : ScriptableObject
         return "";
     }
 }
+
+
+[System.Serializable]
+public class PassiveConditionReference : ScriptableObjectReference<PassiveCondition>
+{
+
+}

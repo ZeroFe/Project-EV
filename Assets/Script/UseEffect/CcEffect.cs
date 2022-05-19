@@ -4,11 +4,11 @@ using UnityEngine;
 // 대충 기절 등 거는 효과
 public class CcEffect : UseEffect
 {
-    public override void TakeUseEffect()
+    public override void TakeUseEffect(GameObject sender, GameObject target)
     {
         throw new System.NotImplementedException();
     }
-    public override string Explain()
+    public string Explain()
     {
         return "CC Effect";
     }

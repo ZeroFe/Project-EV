@@ -15,7 +15,7 @@ public class EnhanceDatabase : ScriptableObject
     public IReadOnlyList<Enhance> Enhances => enhances;
 
 #if UNITY_EDITOR
-    [ContextMenu("FindItem")]
+    [ContextMenu("Find Enhance")]
     private void FindItems()
     {
         string[] guids = AssetDatabase.FindAssets($"t:{typeof(Enhance)}");

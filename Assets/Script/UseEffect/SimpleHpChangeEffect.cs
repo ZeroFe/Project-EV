@@ -26,12 +26,12 @@ public class SimpleHpChangeEffect : UseEffect
     [Tooltip("ratioType에 따른 적용 수치(퍼센트)")]
     [Range(0, 100)] public float RatioPercent = 0;
 
-    public override string Explain()
+    public string Explain()
     {
         return $"SimpleHpChange : {FixedAmount} + {EnhancePercentRate} + {RatioPercent}";
     }
 
-    public override void TakeUseEffect()
+    public override void TakeUseEffect(GameObject sender, GameObject target)
     {
         Debug.Log("call Simple Hp Change");
     }
