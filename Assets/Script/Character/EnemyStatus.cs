@@ -28,6 +28,13 @@ public class EnemyStatus : CharacterStatus
         CurrentHp = maxHp;
     }
 
+    public void PowerUp(float powerupRate)
+    {
+        MaxHp = (int) (MaxHp * powerupRate);
+        CurrentHp = MaxHp;
+        attackPower = (int) (attackPower * powerupRate);
+    }
+
     // Start is called before the first frame update
     void Start()
     {

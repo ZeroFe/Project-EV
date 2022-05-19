@@ -44,7 +44,7 @@ public class UpgradeEnhanceView : MonoBehaviour,
     public void DrawEnhance(Enhance enhance)
     {
         thumbnail.sprite = enhance.Icon;
-        name.text = enhance.name;
+        name.text = enhance.EnhanceName;
         description.text = enhance.Description;
         upgradeEnhance = enhance;
     }

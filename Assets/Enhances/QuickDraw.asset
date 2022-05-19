@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5eec065b387dd24ca23be4e7c79630c, type: 3}
   m_Name: New Equip Enhance_DashEndEvent
   m_EditorClassIdentifier: 
-  _conditionAction: {fileID: 11400000, guid: eddfb4c7724b7554e9c1b96bf960e184, type: 2}
+  _conditionAction: {fileID: 11400000, guid: a1534a5b7bc79214c8c8ebdd9eaedd27, type: 2}
   _conditionActionCount: 1
 --- !u!114 &-1807539159036908550
 MonoBehaviour:
@@ -60,11 +60,12 @@ MonoBehaviour:
   prerequisites: []
   abilities:
   - reference: {fileID: 3019981890938058626}
-  passiveCondition:
-    reference: {fileID: -8749480065783897605}
-  passiveEffect:
-  - reference: {fileID: -1807539159036908550}
-  - reference: {fileID: -15472086750171111}
+  passives:
+  - passiveCondition:
+      reference: {fileID: -8749480065783897605}
+    passiveEffects:
+    - reference: {fileID: -1807539159036908550}
+    - reference: {fileID: -15472086750171111}
 --- !u!114 &3019981890938058626
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -78,9 +79,11 @@ MonoBehaviour:
   m_Name: New Equip Enhance_WeaponEnhance
   m_EditorClassIdentifier: 
   attackSpeedMultiplier: 1
-  reloadSpeedMultiplier: 1
+  reloadTimeMultiplier: 1
   clipSizeAdder: 2
   clipSizeMultiplier: 1
+  spreadAngle: 0
+  projectilePerShot: 1
 --- !u!114 &7677834071550663549
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -94,6 +97,8 @@ MonoBehaviour:
   m_Name: QuickDraw_WeaponEnhance
   m_EditorClassIdentifier: 
   attackSpeedMultiplier: 1
-  reloadSpeedMultiplier: 1
+  reloadTimeMultiplier: 1
   clipSizeAdder: 0
   clipSizeMultiplier: 1
+  spreadAngle: 0
+  projectilePerShot: 1

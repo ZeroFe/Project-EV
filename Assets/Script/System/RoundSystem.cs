@@ -22,6 +22,10 @@ public class RoundSystem : Singleton<RoundSystem>
 
     private float spawnWaitTime;
 
+    // 임시 코드 : 지수승 방식 몬스터 강화
+    [SerializeField] private float enemyPowerupRate = 1.2f;
+    private float currentEnemyPowerup = 1.0f;
+
     [SerializeField]
     private int MaxRound = 10;
     private int currentRound = 0;
@@ -38,6 +42,9 @@ public class RoundSystem : Singleton<RoundSystem>
 
     public void Start()
     {
+        // 임시 코드 : 첫 스테이지는 강화하지 않게 처리
+        currentEnemyPowerup /= enemyPowerupRate;
+
         // 원래는 게임 시작 시 무기를 선택한 후, 라운드를 시작해야 함
         // 일단 간이 테스트로 시작하자마자 라운드 진행
         NextRound();
@@ -79,6 +86,10 @@ public class RoundSystem : Singleton<RoundSystem>
 
         remainEnemyCount = enemySpawnStartCount + currentRound * enemySpawnIncreaseCount;
         spawnWaitTime = spawnBaseTime;
+
+        // 임시 강화
+        currentEnemyPowerup *= enemyPowerupRate;
+
         StartCoroutine(SpawnMonster());
     }
 
@@ -114,6 +125,7 @@ public class RoundSystem : Singleton<RoundSystem>
         Debug.Log("Monster Spawn!!!");
         int randNum = UnityEngine.Random.Range(0, enemyPrefabs.Length);
         var go = Instantiate(enemyPrefabs[randNum], spawnTr.position, Quaternion.identity);
+        go.GetComponent<EnemyStatus>().PowerUp(currentEnemyPowerup);
         EnemyManager.Instance.SetEnemyTarget(go);
         currentEnemyCount++;
     }
@@ -122,9 +134,10 @@ public class RoundSystem : Singleton<RoundSystem>
 
     private void DebugExecute()
     {
+        // Round Skip
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            CheckRoundEnd();
+            
         }
     }
 

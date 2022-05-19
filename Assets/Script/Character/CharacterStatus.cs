@@ -15,7 +15,7 @@ public class CharacterStatus : MonoBehaviour
 
     [SerializeField]
     protected int maxHp = 100;
-    protected int _currentHp = 100;
+    protected int _currentHp;
 
     protected bool isDead = false;
 
@@ -61,6 +61,7 @@ public class CharacterStatus : MonoBehaviour
 
     private void OnEnable()
     {
+        _currentHp = maxHp;
         isDead = false;
     }
 

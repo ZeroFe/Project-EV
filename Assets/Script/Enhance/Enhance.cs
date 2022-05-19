@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -10,6 +9,23 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Equip Enhance", menuName = "Enhance/Enhance")]
 public class Enhance : ScriptableObject
 {
+    [System.Serializable]
+    public class Passive
+    {
+        public PassiveConditionReference passiveCondition;
+        public UseEffectReference[] passiveEffects;
+        
+        public void UsePassiveEffect(GameObject owner)
+        {
+            foreach (var effect in passiveEffects)
+            {
+                // 아이템은 내가 나에게 적용하는 것으로 판단
+                // 고로 sender와 target이 둘 다 owner이다
+                effect.GetReference().TakeUseEffect(owner, owner);
+            }
+        }
+    }
+
     [SerializeField] private string enhanceName;
     [SerializeField] private string codeName;
     [SerializeField] private Sprite icon = null;
@@ -26,32 +42,24 @@ public class Enhance : ScriptableObject
     [Header("Ability")]
     public EnhanceEffectReference[] abilities;
 
-    [Header("Passive")]
-    [SerializeField]
-    private PassiveConditionReference passiveCondition;
-    public UseEffectReference[] passiveEffect;
+    [Header("Passive")] 
+    [SerializeField] private Passive[] passives;
 
     private GameObject owner;
 
     public void Register(GameObject target)
     {
-        if (passiveCondition == null)
+        owner = target;
+        foreach (var passive in passives)
         {
-            return;
-        }
+            if (passive.passiveCondition == null)
+            {
+                return;
+            }
 
-        this.owner = target;
-        passiveCondition.GetReference().Register(target);
-        passiveCondition.GetReference().onSuccessCondition += UseEquipEffect;
-    }
-
-    private void UseEquipEffect()
-    {
-        foreach (var effect in passiveEffect)
-        {
-            // 아이템은 내가 나에게 적용하는 것으로 판단
-            // 고로 sender와 target이 둘 다 owner이다
-            effect.GetReference().TakeUseEffect(owner, owner);
+            passive.passiveCondition.GetReference().Register(target);
+            // 주의 : 패시브 해제해야할 일이 있으면 람다식이 아닌 어댑터로 변경할 것
+            passive.passiveCondition.GetReference().onSuccessCondition += () => passive.UsePassiveEffect(owner);
         }
     }
 
