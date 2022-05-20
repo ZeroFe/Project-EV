@@ -15,7 +15,7 @@ public class SimpleHpBar : MonoBehaviour
     private void Start()
     {
         Debug.Assert(targetStatus, "Error : target Status not setting");
-        targetStatus.onHpChanged += DrawHp;
+        targetStatus.OnHpChanged += DrawHp;
         DrawHp(targetStatus.CurrentHp, targetStatus.MaxHp);
     }
 

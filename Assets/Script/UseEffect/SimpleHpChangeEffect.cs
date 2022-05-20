@@ -33,6 +33,25 @@ public class SimpleHpChangeEffect : UseEffect
 
     public override void TakeUseEffect(GameObject sender, GameObject target)
     {
-        Debug.Log("call Simple Hp Change");
+        var status = target.GetComponent<CharacterStatus>();
+        if (IsHeal)
+        {
+            status.TakeHeal(TotalAmount(status));
+        }
+        else
+        {
+            
+        }
+    }
+
+    /// <summary>
+    /// 합산치
+    /// 주의 : 완성 안 됨. 수정바람
+    /// </summary>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    private int TotalAmount(CharacterStatus status)
+    {
+        return FixedAmount;
     }
 }

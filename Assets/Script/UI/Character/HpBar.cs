@@ -30,7 +30,7 @@ public class HpBar : MonoBehaviour
 
     public void Start()
     {
-        targetStatus.onHpChanged += (int current, int max) => Changed((float) current / max);
+        targetStatus.OnHpChanged += (int current, int max) => Changed((float) current / max);
 
         changedPerLoop = changedPerSecond * ANIMATE_TIME;
         StartCoroutine(HpChangeAnimate());

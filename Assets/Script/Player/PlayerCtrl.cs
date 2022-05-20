@@ -71,27 +71,8 @@ public class PlayerCtrl : MonoBehaviour
     {
         Move();
         Fire();
+        Reload();
     }
-
-    private void LateUpdate()
-    {
-        //Rotate();
-    }
-
-    private void Rotate()
-    {
-        float mx = Input.GetAxis("Mouse X");
-        float my = Input.GetAxis("Mouse Y");
-
-        // 회전 값으로 사용
-        ry += mx * Time.deltaTime * rotationSpeed;
-        rx -= my * Time.deltaTime * rotationSpeed;
-        rx = Mathf.Clamp(rx, bottomClamp, topClamp);
-
-        transform.rotation = Quaternion.AngleAxis(ry, Vector3.up);
-        _main.transform.localRotation = Quaternion.AngleAxis(rx, Vector3.right);
-    }
-
 
     //private void GroundedCheck()
     //{
@@ -210,7 +191,8 @@ public class PlayerCtrl : MonoBehaviour
         // 일단 애니메이션 안 하고 Reload만 하게
         if (Input.GetButtonDown("Reload"))
         {
-            
+            print("Reload");
+            weapon.Reload();
         }
     }
 

@@ -17,7 +17,7 @@ using UnityEditor;
 public class Weapon : MonoBehaviour
 {
     static RaycastHit[] s_HitInfoBuffer = new RaycastHit[8];
-    
+
     public enum TriggerType
     {
         Auto,
@@ -75,6 +75,8 @@ public class Weapon : MonoBehaviour
     public float projectileLaunchForce = 200.0f;
 
     public GameObject bulletEffectPrefab;
+    public ParticleSystem muzzleEffect;
+    public float muzzleEffectTime = 0.05f;
 
     public AdvancedSettings advancedSettings;
 
@@ -140,6 +142,7 @@ public class Weapon : MonoBehaviour
         set
         {
             clipSize = value;
+            CurrentAmmoCount = Math.Min(currentAmmoCount, clipSize);
             WeaponView.Instance.UpdateClipInfo(clipSize);
         }
     }
@@ -155,6 +158,8 @@ public class Weapon : MonoBehaviour
     }
 
     #endregion     
+
+    public event Action OnFire;
 
     void Awake()
     {
@@ -206,15 +211,18 @@ public class Weapon : MonoBehaviour
 
         //the state will only change next frame, so we set it right now.
         m_CurrentState = WeaponState.Firing;
-        
+
+        StartCoroutine(DoMuzzleEffect());
+
         //m_Animator.SetTrigger("fire");
 
         // 소리
         //m_Source.pitch = Random.Range(0.7f, 1.0f);
         //m_Source.PlayOneShot(FireAudioClip);
-        
+
         //CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
 
+        OnFire?.Invoke();
         // 발사 
         if (weaponType == WeaponType.Raycast)
         {
@@ -227,6 +235,14 @@ public class Weapon : MonoBehaviour
         {
             ProjectileShot();
         }
+    }
+
+    IEnumerator DoMuzzleEffect()
+    {
+        muzzleEffect.Stop();
+        muzzleEffect.Play();
+        yield return new WaitForSeconds(muzzleEffectTime);
+        muzzleEffect.Stop();
     }
 
 

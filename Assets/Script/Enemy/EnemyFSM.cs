@@ -35,7 +35,7 @@ public abstract class EnemyFSM : MonoBehaviour
 
     protected void OnEnable()
     {
-        status.onDead += Die;
+        status.OnDead += Die;
     }
 
     public void SetTarget(GameObject target)

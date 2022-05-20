@@ -31,14 +31,14 @@ public class CharacterStatus : MonoBehaviour
                 if (!isDead)
                 {
                     isDead = true;
-                    onDead?.Invoke();
+                    OnDead?.Invoke();
                 }
             }
             else if (_currentHp > maxHp)
             {
                 _currentHp = maxHp;
             }
-            onHpChanged?.Invoke(_currentHp, maxHp);
+            OnHpChanged?.Invoke(_currentHp, maxHp);
         }
     }
 
@@ -47,17 +47,19 @@ public class CharacterStatus : MonoBehaviour
         get => maxHp;
         set
         {
-            // 최대 체력이 늘어나도 체력이 증가하지 않음
+            // 최대 체력이 늘어나면 증감량만큼 현재체력 증가
+            int changedAmount = Math.Max(value - maxHp, 0);
             maxHp = value;
+            CurrentHp += changedAmount;
             Debug.Assert(maxHp > 0, "Error - Max Hp is lower than 0");
-            onHpChanged?.Invoke(_currentHp, maxHp);
+            OnHpChanged?.Invoke(_currentHp, maxHp);
         }
     }
 
-    public event HpChangedHandler onHpChanged;
-    public event Action onDead;
-    public event Action<int> onDamaged;
-    public event Action<int> onHealed;
+    public event HpChangedHandler OnHpChanged;
+    public event Action OnDead;
+    public event Action<int> OnDamaged;
+    public event Action<int> OnHealed;
 
     private void OnEnable()
     {
@@ -73,12 +75,12 @@ public class CharacterStatus : MonoBehaviour
     public void TakeDamage(int amount)
     {
         CurrentHp -= amount;
-        onDamaged?.Invoke(amount);
+        OnDamaged?.Invoke(amount);
     }
 
     public void TakeHeal(int amount)
     {
         CurrentHp += amount;
-        onHealed?.Invoke(amount);
+        OnHealed?.Invoke(amount);
     }
 }

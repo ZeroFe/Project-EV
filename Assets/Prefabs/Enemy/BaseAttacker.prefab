@@ -652,6 +652,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firstTarget: 1
   attackDistance: 8
+  deathTime: 0.3
 --- !u!195 &6690722257769097224
 NavMeshAgent:
   m_ObjectHideFlags: 0

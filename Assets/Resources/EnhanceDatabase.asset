@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enhances:
   - {fileID: 11400000, guid: 7b77448108f43e747a4c4bf3049b81e7, type: 2}
+  - {fileID: 11400000, guid: a10563de44e4fcd4195db01a988d2353, type: 2}
+  - {fileID: 11400000, guid: 3af19a18b7484e9438b684c277b5ec05, type: 2}
   - {fileID: 11400000, guid: 56c8f8635879354458bab2061c775542, type: 2}
   - {fileID: 11400000, guid: e7711ab27db211147a24d165415aa523, type: 2}
   - {fileID: 11400000, guid: bfe44e67b681253429aac700056b2fdc, type: 2}

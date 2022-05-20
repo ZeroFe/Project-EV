@@ -15,9 +15,10 @@ public class EnemyStatus : CharacterStatus
 
     private void OnEnable()
     {
-        onDead += RoundSystem.Instance.CheckRoundEnd;
+        OnDead += RoundSystem.Instance.CheckRoundEnd;
         Init();
     }
+
 
     /// <summary>
     /// Enemy의 경우 Object Pool을 이용해 재사용되므로
@@ -38,7 +39,7 @@ public class EnemyStatus : CharacterStatus
     // Start is called before the first frame update
     void Start()
     {
-        
+        OnDamaged += (int amount) => EnemyManager.Instance.DrawDamaged(gameObject, amount);
     }
 
     // Update is called once per frame

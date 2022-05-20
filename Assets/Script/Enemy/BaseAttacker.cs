@@ -20,6 +20,7 @@ public class BaseAttacker : EnemyFSM
     public float attackDistance = 2f;
     float currentTime = 0;
     float attackDelay = 2f;
+    public float deathTime = 0.5f;
 
     void Start()
     {
@@ -28,7 +29,7 @@ public class BaseAttacker : EnemyFSM
 
         // 자식 오브젝트로부터 애니메이터 변수 받아오기
 
-        status.onDead += Die;
+        status.OnDead += Die;
     }
 
     void Update()
@@ -195,7 +196,7 @@ public class BaseAttacker : EnemyFSM
         cc.enabled = false;
 
         // 2초 동안 기다린 뒤에 자기 자신을 제거한다.
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(deathTime);
         print("소멸!");
         Destroy(gameObject);
     }

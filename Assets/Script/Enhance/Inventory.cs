@@ -10,14 +10,10 @@ using UnityEngine.Events;
 public class Inventory : MonoBehaviour
 {
     #region Events
-    public delegate void AddItemHandler(Enhance enhance);
+    public delegate void AddItemHandler(string enhanceCodeName);
     #endregion
 
     public event AddItemHandler OnAddItem;
-
-    // int에 들어가는 값은 Enhance Code
-    public class AddItemEvent : UnityEvent<int> { }
-    public AddItemEvent addItemEvent { get; set; } = new AddItemEvent();
 
     private List<Enhance> enhances = new List<Enhance>();
     public IReadOnlyList<Enhance> Enhances => enhances;
