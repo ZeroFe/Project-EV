@@ -651,8 +651,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstTarget: 1
+  renderer: {fileID: 6690722257769097220}
   attackDistance: 8
-  deathTime: 0.3
+  deathTime: 2.5
 --- !u!195 &6690722257769097224
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -747,8 +748,7 @@ MonoBehaviour:
   targetStatus: {fileID: 8347078419933181505}
   fillHp: {fileID: 6690722257008040088}
   changedHp: {fileID: 6690722256612971724}
-  animationTime: 0.05
-  changedPerSecond: 0.2
+  animationTime: 0.7
 --- !u!1 &6690722258466029487
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// 캐릭터 능력치 클래스
-/// 
 /// </summary>
 public class CharacterStatus : MonoBehaviour
 {
@@ -15,30 +14,30 @@ public class CharacterStatus : MonoBehaviour
 
     [SerializeField]
     protected int maxHp = 100;
-    protected int _currentHp;
+    protected int currentHp;
 
     protected bool isDead = false;
 
     public int CurrentHp
     {
-        get => _currentHp;
+        get => currentHp;
         set
         {
-            _currentHp = value;
-            if (_currentHp <= 0)
+            currentHp = value;
+            if (currentHp <= 0)
             {
-                _currentHp = 0;
+                currentHp = 0;
                 if (!isDead)
                 {
                     isDead = true;
                     OnDead?.Invoke();
                 }
             }
-            else if (_currentHp > maxHp)
+            else if (currentHp > maxHp)
             {
-                _currentHp = maxHp;
+                currentHp = maxHp;
             }
-            OnHpChanged?.Invoke(_currentHp, maxHp);
+            OnHpChanged?.Invoke(currentHp, maxHp);
         }
     }
 
@@ -52,7 +51,7 @@ public class CharacterStatus : MonoBehaviour
             maxHp = value;
             CurrentHp += changedAmount;
             Debug.Assert(maxHp > 0, "Error - Max Hp is lower than 0");
-            OnHpChanged?.Invoke(_currentHp, maxHp);
+            OnHpChanged?.Invoke(currentHp, maxHp);
         }
     }
 
@@ -61,9 +60,9 @@ public class CharacterStatus : MonoBehaviour
     public event Action<int> OnDamaged;
     public event Action<int> OnHealed;
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
-        _currentHp = maxHp;
+        currentHp = maxHp;
         isDead = false;
     }
 

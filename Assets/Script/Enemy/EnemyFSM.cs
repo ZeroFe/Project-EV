@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 [RequireComponent(typeof(EnemyStatus))]
 [RequireComponent(typeof(CharacterController))]
@@ -26,16 +27,19 @@ public abstract class EnemyFSM : MonoBehaviour
     protected CharacterController cc;
     //protected Animator anim;
 
+    // 죽을 때 Fade Out 투명도 처리 예정
+    [SerializeField]
+    protected Renderer renderer;
+    protected Material mat;
+
     protected void Awake()
     {
         status = GetComponent<EnemyStatus>();
         cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
-    }
 
-    protected void OnEnable()
-    {
-        status.OnDead += Die;
+        Debug.Assert(renderer, "Error : There is no Renderer");
+        mat = renderer.material;
     }
 
     public void SetTarget(GameObject target)
@@ -81,5 +85,6 @@ public abstract class EnemyFSM : MonoBehaviour
     // 죽음 상태 함수
     public virtual void Die()
     {
+        mat.DOFade(0.0f, 0.5f);
     }
 }

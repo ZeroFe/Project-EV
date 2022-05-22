@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class HpBar : MonoBehaviour
 {
-    public static readonly float ANIMATE_TIME = 0.025f;
-
     public CharacterStatus targetStatus;
 
     [Header("Component")]
@@ -16,9 +15,7 @@ public class HpBar : MonoBehaviour
     [SerializeField] private Image changedHp;
 
     [Header("Animation")]
-    [SerializeField] private float animationTime = 0.05f;
-    [SerializeField] private float changedPerSecond = 0.2f;
-    private float changedPerLoop;
+    [SerializeField] private float animationTime = 0.7f;
 
     private void Awake()
     {
@@ -28,28 +25,25 @@ public class HpBar : MonoBehaviour
         Debug.Assert(changedHp);
     }
 
-    public void Start()
+    public void OnEnable()
     {
-        targetStatus.OnHpChanged += (int current, int max) => Changed((float) current / max);
-
-        changedPerLoop = changedPerSecond * ANIMATE_TIME;
-        StartCoroutine(HpChangeAnimate());
+        targetStatus.OnHpChanged += Draw;
     }
 
-    public void Changed(float percent)
+    public void Draw(int current, int max)
+    {
+        Draw((float)current / max);
+    }
+
+    public void Draw(float percent)
     {
         fillHp.fillAmount = percent;
+        changedHp.DOFillAmount(percent, animationTime).
+            SetEase(Ease.Linear);
     }
 
-    IEnumerator HpChangeAnimate()
+    public void End()
     {
-        while (true)
-        {
-            if (fillHp.fillAmount < changedHp.fillAmount)
-            {
-                changedHp.fillAmount = Mathf.Max(changedHp.fillAmount - changedPerLoop, fillHp.fillAmount);
-            }
-            yield return new WaitForSeconds(ANIMATE_TIME);
-        }
+        targetStatus.OnHpChanged -= Draw;
     }
 }

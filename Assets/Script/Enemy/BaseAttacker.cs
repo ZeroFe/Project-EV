@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 public class BaseAttacker : EnemyFSM
 {
@@ -187,7 +188,12 @@ public class BaseAttacker : EnemyFSM
         StopAllCoroutines();
 
         // 죽음 상태를 처리하기 위한 코루틴을 실행한다.
-        StartCoroutine(DieProcess());
+        //StartCoroutine(DieProcess());
+        print("Do Fade");
+        cc.enabled = false;
+
+        mat.DOFade(0.0f, deathTime);
+        Destroy(gameObject, deathTime + 0.1f);
     }
 
     IEnumerator DieProcess()
