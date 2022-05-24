@@ -66,11 +66,6 @@ public class CharacterStatus : MonoBehaviour
         isDead = false;
     }
 
-    void Update()
-    {
-
-    }
-
     public void TakeDamage(int amount)
     {
         CurrentHp -= amount;

@@ -7,6 +7,8 @@ using UnityEngine;
 // 여러 디버그용 Round를 제작해야할 수도 있기 때문
 public class RoundSystem : Singleton<RoundSystem>
 {
+    public static RoundSystem Instance { get; private set; }
+
     private static readonly float SPAWN_CHECK_TIME = 0.1f;
     
     public List<Round> rounds = new List<Round>();
@@ -21,6 +23,12 @@ public class RoundSystem : Singleton<RoundSystem>
 
     [Header("UI")]
     public GameObject GameClearUI;
+
+    private void Awake()
+    {
+        Debug.Assert(!Instance, "There is two or more Round System");
+        Instance = this;
+    }
 
     public void Start()
     {
@@ -44,7 +52,7 @@ public class RoundSystem : Singleton<RoundSystem>
         if (remainEnemyCount == 0 && CurrentRound.enemySpawns.Count == 0)
         {
             // 게임 끝났나 체크
-            if (currentRoundIndex == rounds.Count)
+            if (currentRoundIndex == rounds.Count - 1)
             {
                 // 게임 끝났으면 게임 완료 처리
                 GameClearUI.SetActive(true);
@@ -80,7 +88,7 @@ public class RoundSystem : Singleton<RoundSystem>
         foreach (var spawn in enemySpawns)
         {
             spawn.spawnWaitTime = spawn.startTime;
-            spawn.remainCount = spawn.count;
+            spawn.remainCount = spawn.Count;
         }
 
         // 
@@ -96,16 +104,21 @@ public class RoundSystem : Singleton<RoundSystem>
                     // 순차적으로 스폰
                     if (currEnemySpawn.spawnType == Round.EnemySpawn.SpawnType.Sequence)
                     {
-                        // 스폰 코드
+                        CreateEnemy(currEnemySpawn, CurrentRound.enemyPowerupRate);
+
+                        currEnemySpawn.remainCount--;
                         currEnemySpawn.spawnWaitTime = 
-                            currEnemySpawn.periodScaleCurve.Evaluate((float)currEnemySpawn.remainCount / currEnemySpawn.count) * 
-                            currEnemySpawn.period;
+                            currEnemySpawn.intervalScaleCurve.Evaluate((float)currEnemySpawn.remainCount / currEnemySpawn.Count) * 
+                            currEnemySpawn.interval;
                     }
                     // 한 번에 스폰
                     else if (currEnemySpawn.spawnType == Round.EnemySpawn.SpawnType.Emission)
                     {
-                        // for문 스폰 코드
-                        currEnemySpawn.count = 0;
+                        for (int j = 0; j < currEnemySpawn.Count; j++)
+                        {
+                            CreateEnemy(currEnemySpawn, CurrentRound.enemyPowerupRate);
+                        }
+                        currEnemySpawn.remainCount = 0;
                     }
                 }
 
@@ -119,23 +132,21 @@ public class RoundSystem : Singleton<RoundSystem>
                 }
             }
 
-            // 몬스터를 처치하면 스폰 간격 좀 줄인다 - 보류
             yield return new WaitForSeconds(SPAWN_CHECK_TIME);
         }
 
         Debug.Log("create end");
     }
 
-    //private void Spawn()
-    //{
-    //    // 중간 중간 설정한 몬스터가 나와야 한다
-    //    Debug.Log("Monster Spawn!!!");
-    //    int randNum = UnityEngine.Random.Range(0, enemyPrefabs.Length);
-    //    var go = Instantiate(enemyPrefabs[randNum], spawnTr.position, Quaternion.identity);
-    //    go.GetComponent<EnemyStatus>().PowerUp(currentEnemyPowerup);
-    //    EnemyManager.Instance.SetEnemyTarget(go);
-    //    currentEnemyCount++;
-    //}
+    private void CreateEnemy(Round.EnemySpawn enemySpawn, float powerUp)
+    {
+        // 중간 중간 설정한 몬스터가 나와야 한다
+        Debug.Log("Monster CreateEnemy!!!");
+        var enemy = Instantiate(enemySpawn.enemyPrefab);
+        EnemyManager.Instance.InitEnemy(enemy, enemySpawn.routeObject);
+        enemy.GetComponent<EnemyStatus>().PowerUp(powerUp);
+        remainEnemyCount++;
+    }
 
     #region Debug
 

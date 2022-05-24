@@ -27,6 +27,8 @@ public abstract class EnemyFSM : MonoBehaviour
     protected CharacterController cc;
     //protected Animator anim;
 
+    private Collider hitCollider;
+
     // 죽을 때 Fade Out 투명도 처리 예정
     [SerializeField]
     protected Renderer renderer;
@@ -35,56 +37,38 @@ public abstract class EnemyFSM : MonoBehaviour
     protected void Awake()
     {
         status = GetComponent<EnemyStatus>();
+        status.OnDead += OnDead;
+
         cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
+
+        hitCollider = GetComponent<Collider>();
+        Debug.Assert(hitCollider, "There is no Collider");
 
         Debug.Assert(renderer, "Error : There is no Renderer");
         mat = renderer.material;
     }
 
-    public void SetTarget(GameObject target)
+    protected virtual void OnEnable()
+    {
+        hitCollider.enabled = true;
+    }
+
+    public void Init(GameObject target, GameObject route)
     {
         this.target = target;
         targetTr = target.transform;
+
+        transform.position = route.transform.position;
+        agent.Warp(transform.position);
     }
 
-    void Start()
+    /// <summary>
+    /// 죽으면 타격되서도 안 되고, 멈춰야 한다
+    /// </summary>
+    protected virtual void OnDead()
     {
-    }
-
-    void Update()
-    {
-        
-    }
-
-    protected virtual void Idle()
-    {
-        
-    }
-
-    protected virtual void Move()
-    {
-        
-    }
-
-    void Attack()
-    {
-        
-    }
-
-    // 데미지 실행 함수
-    public virtual void HitEnemy(int hitPower)
-    {
-
-    }
-
-    void Damaged()
-    {
-    }
-
-    // 죽음 상태 함수
-    public virtual void Die()
-    {
-        mat.DOFade(0.0f, 0.5f);
+        agent.isStopped = true;
+        hitCollider.enabled = false;
     }
 }

@@ -15,19 +15,13 @@ public class EnemyStatus : CharacterStatus
 
     [FormerlySerializedAs("damage")] public int attackPower = 3;
 
-    private Collider hitCollider;
-
     private void Awake()
     {
-        hitCollider = GetComponent<Collider>();
-        Debug.Assert(hitCollider, "There is no Collider");
     }
 
     protected override void OnEnable()
     {
         base.OnEnable();
-        hitCollider.enabled = true;
-        OnDead += RoundSystem.Instance.CheckRoundEnd;
         Init();
     }
 
@@ -45,27 +39,23 @@ public class EnemyStatus : CharacterStatus
         CurrentHp = maxHp;
     }
 
+    void Start()
+    {
+        OnDamaged += (int amount) => EnemyManager.Instance.DrawDamaged(gameObject, amount);
+        OnDead += RoundSystem.Instance.CheckRoundEnd;
+    }
+
+    void Update()
+    {
+
+    }
+
+
+
     public void PowerUp(float powerupRate)
     {
         MaxHp = (int) (MaxHp * powerupRate);
         CurrentHp = MaxHp;
         attackPower = (int) (attackPower * powerupRate);
-    }
-
-    private void DeactiveCollider()
-    {
-        hitCollider.enabled = false;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        OnDamaged += (int amount) => EnemyManager.Instance.DrawDamaged(gameObject, amount);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

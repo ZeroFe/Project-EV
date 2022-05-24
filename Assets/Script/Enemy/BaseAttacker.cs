@@ -123,6 +123,25 @@ public class BaseAttacker : EnemyFSM
         }
     }
 
+    //public void OnAttackHit()
+    //{
+    //    print("OnAttackHit");
+    //    if (Vector3.Distance(transform.position, target.transform.position) < agent.stoppingDistance)
+    //    {
+    //    }
+    //}
+
+    //public void OnAttackFinished()
+    //{
+    //    print("OnAttackFinished");
+    //    // 만약 공격 가능 거리를 벗어났다면, 
+    //    if (Vector3.Distance(transform.position, target.transform.position) >= agent.stoppingDistance)
+    //    {
+    //        enemyState = EnemyState.Move;
+    //        animator.SetTrigger("Move");
+    //    }
+    //}
+
     // 플레이어의 스크립트의 데미지 처리 함수를 실행하기
     public void AttackAction()
     {
@@ -182,7 +201,7 @@ public class BaseAttacker : EnemyFSM
     }
 
     // 죽음 상태 함수
-    public override void Die()
+    public void Die()
     {
         // 진행중인 피격 코루틴을 중지한다.
         StopAllCoroutines();
@@ -194,16 +213,5 @@ public class BaseAttacker : EnemyFSM
 
         mat.DOFade(0.0f, deathTime);
         Destroy(gameObject, deathTime + 0.1f);
-    }
-
-    IEnumerator DieProcess()
-    {
-        // 캐릭터 콘트롤러 컴포넌트를 비활성화한다.
-        cc.enabled = false;
-
-        // 2초 동안 기다린 뒤에 자기 자신을 제거한다.
-        yield return new WaitForSeconds(deathTime);
-        print("소멸!");
-        Destroy(gameObject);
     }
 }
