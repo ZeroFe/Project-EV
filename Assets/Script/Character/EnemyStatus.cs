@@ -50,8 +50,6 @@ public class EnemyStatus : CharacterStatus
 
     }
 
-
-
     public void PowerUp(float powerupRate)
     {
         MaxHp = (int) (MaxHp * powerupRate);

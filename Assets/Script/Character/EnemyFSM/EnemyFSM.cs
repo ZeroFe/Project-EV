@@ -25,7 +25,7 @@ public abstract class EnemyFSM : MonoBehaviour
     protected EnemyStatus status;
     protected NavMeshAgent agent;
     protected CharacterController cc;
-    //protected Animator anim;
+    protected Animator anim;
 
     private Collider hitCollider;
 
@@ -41,6 +41,7 @@ public abstract class EnemyFSM : MonoBehaviour
 
         cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
+        anim = GetComponentInChildren<Animator>();
 
         hitCollider = GetComponent<Collider>();
         Debug.Assert(hitCollider, "There is no Collider");

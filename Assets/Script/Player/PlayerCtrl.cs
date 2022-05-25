@@ -127,7 +127,6 @@ public class PlayerCtrl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            Debug.Log("LShift");
             // Dash Å° ´©¸§
             if (!isDashing && currentDashCount > 0)
             {

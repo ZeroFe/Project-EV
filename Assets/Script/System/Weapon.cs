@@ -376,7 +376,7 @@ public class Weapon : MonoBehaviour
 
     void UpdateWeaponState()
     {
-        //m_Animator.SetFloat("speed", m_Owner.Speed);
+        //m_Animator.SetFloat("moveSpeed", m_Owner.Speed);
         //m_Animator.SetBool("grounded", m_Owner.Grounded);
 
         //var info = m_Animator.GetCurrentAnimatorStateInfo(0);

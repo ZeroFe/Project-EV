@@ -140,8 +140,6 @@ public class RoundSystem : Singleton<RoundSystem>
 
     private void CreateEnemy(Round.EnemySpawn enemySpawn, float powerUp)
     {
-        // 중간 중간 설정한 몬스터가 나와야 한다
-        Debug.Log("Monster CreateEnemy!!!");
         var enemy = Instantiate(enemySpawn.enemyPrefab);
         EnemyManager.Instance.InitEnemy(enemy, enemySpawn.routeObject);
         enemy.GetComponent<EnemyStatus>().PowerUp(powerUp);
