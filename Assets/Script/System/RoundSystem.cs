@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 // 디버그를 위해 의도적으로 DisallowMultipleComponent는 넣지 않는다
 // 여러 디버그용 Round를 제작해야할 수도 있기 때문
@@ -81,6 +82,11 @@ public class RoundSystem : MonoBehaviour
         StartCoroutine(SpawnMonsters());
     }
 
+    //private IEnumerator DoNextRound()
+    //{
+
+    //}
+
     private IEnumerator SpawnMonsters()
     {
         var enemySpawns = CurrentRound.enemySpawns;
@@ -101,6 +107,12 @@ public class RoundSystem : MonoBehaviour
                 var currEnemySpawn = enemySpawns[i];
                 if (currEnemySpawn.spawnWaitTime <= 0)
                 {
+                    // 스폰 위치에 해당하는 곳에 알림 표시 띄우기
+                    //if ()
+                    //{
+                        
+                    //}
+
                     // 순차적으로 스폰
                     if (currEnemySpawn.spawnType == Round.EnemySpawn.SpawnType.Sequence)
                     {

@@ -13,7 +13,7 @@ public class SpiderFSM : EnemyFSM
     public override void OnAttackHit()
     {
         RaycastHit hit;
-        if (IsInAttackDistance(out hit))
+        if (IsInAttackDistance())
         {
             attackTarget.GetComponent<CharacterStatus>().TakeDamage(status.attackPower);
         }

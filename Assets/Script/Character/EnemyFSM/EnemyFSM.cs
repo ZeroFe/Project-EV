@@ -31,13 +31,23 @@ public abstract class EnemyFSM : MonoBehaviour
 
     public FirstTarget firstTarget;
 
-    [SerializeField, Tooltip("이동 속도")]
-    protected float moveSpeed = 3.5f;
-    [SerializeField, Tooltip("플레이어 등 인식하는 거리")]
+    // 차후 추가될 돌연변이 시스템에서 변경할 수 있는 변수들이므로 일부러 public으로 선언
+    [Tooltip("이동 속도")]
+    public float moveSpeed = 3.5f;
+
+    protected float currentMoveSpeed;
+    [Tooltip("플레이어 등 인식하는 거리")]
     public float findDistance = 4.0f;
-    [SerializeField, Tooltip("공격 사거리")]
-    protected float attackDistance = 2f;
+    [Tooltip("공격 사거리")]
+    public float attackDistance = 2f;
     protected float realAttackDistance;
+
+    [Tooltip("소경직 반응 비율")] 
+    public float hurtReactRate = 0.15f;
+    [Tooltip("대경직 반응 비율")]
+    public float knockbackReactRate = 0.3f;
+    //protected float 
+
     [SerializeField, Tooltip("시체 사라지는 속도")]
     public float deathTime = 0.5f;
 
@@ -57,28 +67,29 @@ public abstract class EnemyFSM : MonoBehaviour
     protected Renderer renderer;
     protected Material mat;
 
-    public float MoveSpeed
+    public float CurrentMoveSpeed
     {
-        get => moveSpeed;
+        get => currentMoveSpeed;
         set
         {
-            moveSpeed = value;
-            anim.SetFloat(speedNameHash, moveSpeed);
+            currentMoveSpeed = value;
+            anim.SetFloat(speedNameHash, currentMoveSpeed);
             agent.speed = moveSpeed;
         }
     }
 
-
     protected static readonly int speedNameHash = Animator.StringToHash("Speed");
     protected static readonly int attackNameHash = Animator.StringToHash("Attack");
     protected static readonly int deadNameHash = Animator.StringToHash("Dead");
-    protected static readonly int getHitNameHash = Animator.StringToHash("GetHit");
+    protected static readonly int hurtNameHash = Animator.StringToHash("Hurt");
+    protected static readonly int knockbackNameHash = Animator.StringToHash("Knockback");
 
     protected void Awake()
     {
         playerLayer = 1 << LayerMask.NameToLayer("Player");
 
         status = GetComponent<EnemyStatus>();
+        status.OnDamaged += OnDamaged;
         status.OnDead += OnDead;
 
         agent = GetComponent<NavMeshAgent>();
@@ -97,7 +108,7 @@ public abstract class EnemyFSM : MonoBehaviour
 
         state = EnemyState.Idle;
 
-        MoveSpeed = moveSpeed;
+        CurrentMoveSpeed = moveSpeed;
         agent.stoppingDistance = attackDistance;
 
         // 죽음 모션 처리
@@ -114,10 +125,14 @@ public abstract class EnemyFSM : MonoBehaviour
         agent.Warp(transform.position);
     }
 
-    public bool IsInAttackDistance(out RaycastHit hit)
+    // 사거리 안에 들어가는지 판정
+    // 건물 등 물체가 큰 경우 Distance로만 하면 공격을 못하는 경우가 있다
+    // 고로 거리 안에 들어오지 못한다 판단하면 레이를 쏴서 거리 보정을 한다
+    public bool IsInAttackDistance()
     {
-        return Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), 
-            out hit, attackDistance, playerLayer);
+        RaycastHit hit;
+        return Vector3.Distance(transform.position, attackTarget.transform.position) < attackDistance || 
+               Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, attackDistance, playerLayer);
     }
 
 
@@ -178,8 +193,7 @@ public abstract class EnemyFSM : MonoBehaviour
             attackTarget = originTarget;
         }
 
-        RaycastHit hit;
-        if (IsInAttackDistance(out hit))
+        if (IsInAttackDistance())
         {
             print("In attack Distance");
             state = EnemyState.Attack;
@@ -194,8 +208,7 @@ public abstract class EnemyFSM : MonoBehaviour
     #region Attack
     void Attack()
     {
-        RaycastHit hit;
-        if (IsInAttackDistance(out hit))
+        if (IsInAttackDistance())
         {
             agent.isStopped = true;
             anim.SetBool(attackNameHash, true);
@@ -205,7 +218,7 @@ public abstract class EnemyFSM : MonoBehaviour
     public virtual void OnAttackHit()
     {
         RaycastHit hit;
-        if (IsInAttackDistance(out hit))
+        if (IsInAttackDistance())
         {
             attackTarget.GetComponent<CharacterStatus>().TakeDamage(status.attackPower);
         }
@@ -213,10 +226,16 @@ public abstract class EnemyFSM : MonoBehaviour
 
     public virtual void OnAttackFinished()
     {
-        print("OnAttackFinished");
+        // 죽은 상태면 바로 죽음 모션 수행하게 한다
+        if (state == EnemyState.Die)
+        {
+            anim.SetTrigger(deadNameHash);
+            return;
+        }
+
         // 만약 공격 가능 거리를 벗어났다면, 
         RaycastHit hit;
-        if (!IsInAttackDistance(out hit))
+        if (!IsInAttackDistance())
         {
             state = EnemyState.Move;
             //anim.SetTrigger(spe);
@@ -225,11 +244,24 @@ public abstract class EnemyFSM : MonoBehaviour
     }
     #endregion
 
-    public virtual void OnDamaged()
+    #region Hit Reaction
+    public virtual void OnDamaged(int amount)
     {
-        print("Damaged Animation");
-        agent.isStopped = true;
-        anim.SetTrigger("React");
+        float lostHpRate = (float) amount / status.MaxHp;
+        if (lostHpRate > hurtReactRate)
+        {
+            print("Damaged Animation");
+            agent.isStopped = true;
+            if (lostHpRate > knockbackReactRate)
+            {
+                anim.SetTrigger(knockbackNameHash);
+            }
+            else
+            {
+                anim.SetTrigger(hurtNameHash);
+            }
+        }
+        
         //StopCoroutine(Flash());
         //StartCoroutine(Flash());
     }
@@ -251,12 +283,20 @@ public abstract class EnemyFSM : MonoBehaviour
 
     public virtual void OnReactFinished()
     {
-        //if (state == EnemyState.Death) return;
+        if (state == EnemyState.Die)
+        {
+            // 죽은 상태면 모션은 Idle 전환 후, 바로 죽게 처리
+            print("already die");
+            anim.SetBool(attackNameHash, false);
+            CurrentMoveSpeed = 0.0f;
+            anim.SetTrigger(deadNameHash);
+            return;
+        }
 
         agent.isStopped = false;
         state = EnemyState.Move;
-        //anim.SetTrigger("Move");
     }
+    #endregion
 
     /// <summary>
     /// 죽으면 타격되서도 안 되고, 멈춰야 한다

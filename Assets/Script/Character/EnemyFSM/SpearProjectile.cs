@@ -31,8 +31,6 @@ public class SpearProjectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        print("Collision Spear");
-
         var status = collision.gameObject.GetComponent<CharacterStatus>();
         if (status)
         {

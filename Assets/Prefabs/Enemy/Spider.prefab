@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 6690722257769097224}
   - component: {fileID: 7561482023881099773}
   m_Layer: 10
-  m_Name: BaseAttacker
+  m_Name: Spider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -622,6 +622,8 @@ MonoBehaviour:
   moveSpeed: 3.5
   findDistance: 4
   attackDistance: 2
+  hurtReactRate: 0.15
+  knockbackReactRate: 0.3
   deathTime: 2.5
   renderer: {fileID: 3311141978419786703}
 --- !u!195 &6690722257769097224
@@ -1093,7 +1095,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100118, guid: b233149cc93015747a7a63d9e61def67, type: 3}
   m_PrefabInstance: {fileID: 3311141978414610543}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6114512567149103895
+--- !u!114 &3457113313070979039
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1102,7 +1104,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3311141978414579577}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ae614cdeff00494f9a1422056233d7a, type: 3}
+  m_Script: {fileID: 11500000, guid: bcd315925b73f7e4b9b636e6bcb79a88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &3311141978414998169 stripped
