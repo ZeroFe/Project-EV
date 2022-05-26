@@ -13,7 +13,7 @@ public class SpearThrowerFsmEventHandler : MonoBehaviour
 
     public void OnSpearThrow()
     {
-        //fsm.OnSpearThrow();
+        fsm.OnAttackHit();
     }
 
     //public void OnAttackFinished()

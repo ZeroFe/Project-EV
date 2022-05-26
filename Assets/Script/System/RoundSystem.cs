@@ -5,7 +5,7 @@ using UnityEngine;
 
 // 디버그를 위해 의도적으로 DisallowMultipleComponent는 넣지 않는다
 // 여러 디버그용 Round를 제작해야할 수도 있기 때문
-public class RoundSystem : Singleton<RoundSystem>
+public class RoundSystem : MonoBehaviour
 {
     public static RoundSystem Instance { get; private set; }
 

@@ -383,7 +383,6 @@ public class Weapon : MonoBehaviour
 
         if (m_CurrentState == WeaponState.Firing &&  m_ShotTimer <= 0)
         {
-            Debug.Log("To Idle");
             m_CurrentState = WeaponState.Idle;
         }
         else if (m_CurrentState == WeaponState.Reloading && currentReloadTime <= 0)

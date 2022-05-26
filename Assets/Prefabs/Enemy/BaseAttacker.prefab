@@ -567,7 +567,6 @@ GameObject:
   - component: {fileID: 8347078419933181505}
   - component: {fileID: 2577517526687043316}
   - component: {fileID: 6690722257769097224}
-  - component: {fileID: 6690722257769097227}
   - component: {fileID: 7561482023881099773}
   m_Layer: 10
   m_Name: BaseAttacker
@@ -620,10 +619,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstTarget: 1
-  renderer: {fileID: 3311141978419786703}
   moveSpeed: 3.5
-  attackDistance: 8
+  findDistance: 4
+  attackDistance: 2
   deathTime: 2.5
+  renderer: {fileID: 3311141978419786703}
 --- !u!195 &6690722257769097224
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -646,24 +646,6 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!143 &6690722257769097227
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6690722257769097218}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.3, z: 0}
 --- !u!65 &7561482023881099773
 BoxCollider:
   m_ObjectHideFlags: 0

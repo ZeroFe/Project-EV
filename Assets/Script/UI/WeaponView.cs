@@ -13,7 +13,6 @@ public class WeaponView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI weaponClipSize;
     [SerializeField] private TextMeshProUGUI ammoCount;
     [SerializeField] private Image reloadFill;
-    [SerializeField] private Slider reloadBar;
 
     private void Awake()
     {
@@ -22,7 +21,6 @@ public class WeaponView : MonoBehaviour
         Debug.Assert(weaponClipSize, $"{weaponClipSize.name} not set");
         Debug.Assert(ammoCount, $"{ammoCount.name} not set");
         Debug.Assert(reloadFill, $"{reloadFill.name} not set");
-        Debug.Assert(reloadBar, $"{reloadBar.name} not set");
     }
 
     public void UpdateClipInfo(int amount)
@@ -37,7 +35,6 @@ public class WeaponView : MonoBehaviour
 
     public void UpdateReloadBar(float percent)
     {
-        //reloadBar.value = Mathf.Clamp01(percent);
         reloadFill.fillAmount = Mathf.Clamp01(percent);
     }
 }
