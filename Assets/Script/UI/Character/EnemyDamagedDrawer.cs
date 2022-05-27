@@ -31,6 +31,13 @@ public class EnemyDamagedDrawer : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void SetDrawCritical(Vector3 position)
+    {
+        damageText.text = "Critical";
+        damageText.color = Color.red;
+        _gravity = -1.0f;
+    }
+
     public void SetDrawInfo(int damage, Color color, Vector3 position)
     {
         Vector3 initVec = new Vector3(

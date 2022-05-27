@@ -11,11 +11,11 @@ public class HpBar : MonoBehaviour
     public CharacterStatus targetStatus;
 
     [Header("Component")]
-    [SerializeField] private Image fillHp;
-    [SerializeField] private Image changedHp;
+    [SerializeField] protected Image fillHp;
+    [SerializeField] protected Image changedHp;
 
     [Header("Animation")]
-    [SerializeField] private float animationTime = 0.7f;
+    [SerializeField] protected float animationTime = 0.7f;
 
     private void Awake()
     {
@@ -30,12 +30,12 @@ public class HpBar : MonoBehaviour
         targetStatus.OnHpChanged += Draw;
     }
 
-    public void Draw(int current, int max)
+    public virtual void Draw(int current, int max)
     {
         Draw((float)current / max);
     }
 
-    public void Draw(float percent)
+    public virtual void Draw(float percent)
     {
         fillHp.fillAmount = percent;
         changedHp.DOFillAmount(percent, animationTime).

@@ -66,6 +66,12 @@ public class CharacterStatus : MonoBehaviour
         isDead = false;
     }
 
+    private void Start()
+    {
+        // 초기 UI 갱신용
+        CurrentHp = CurrentHp;
+    }
+
     public void TakeDamage(int amount)
     {
         CurrentHp -= amount;

@@ -38,6 +38,13 @@ public class Round
         [Tooltip("생성 주기가 점점 줄어들게 커브 세팅")]
         public AnimationCurve intervalScaleCurve = AnimationCurve.EaseInOut(0.0f, 0.5f, 1.0f, 1.0f);
 
+        [Header("Power Up Setting")]
+        [Tooltip("적이 얼마나 강화될지")]
+        public float enemyPowerupRate = 1.2f;
+        // 돌연변이 확률
+        //public float enemyMutateChance = 0.0f;
+
+
         [Header("For Spawn")]
         // 디버그용으로 public으로 냅두고, 이후 HideInspector를 적용해서 안 보이게 한다
         public float spawnWaitTime = 0.0f;
@@ -48,11 +55,6 @@ public class Round
 
     public List<EnemySpawn> enemySpawns = new List<EnemySpawn>();
 
-    [Header("Round Power Up Setting")]
     
-    public float enemyPowerupRate = 1.2f;
-    // 돌연변이 확률
-    //public float enemyMutateChance = 0.0f;
-
 
 }

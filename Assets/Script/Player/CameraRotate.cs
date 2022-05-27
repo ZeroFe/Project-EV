@@ -4,13 +4,26 @@ using UnityEngine;
 
 public class CameraRotate : MonoBehaviour
 {
+    [System.Serializable]
+    private class AdvencedSetting
+    {
+        public Transform targetTr;
+        public bool isRotateX = false;
+        public bool isRotateY = true;
+    }
+
     [SerializeField, Range(100, 1000)]
     private float rotationSpeed = 200.0f;
     private float rx = 0.0f;
     private float ry = 0.0f;
 
+    [SerializeField]
     private float bottomClamp = -90.0f;
+    [SerializeField]
     private float topClamp = 90.0f;
+
+    [Header("Advanced Setting")] [SerializeField]
+    private List<AdvencedSetting> advencedSettings = new List<AdvencedSetting>();
 
     private Camera _main;
 
@@ -19,13 +32,6 @@ public class CameraRotate : MonoBehaviour
         _main = Camera.main;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
     void Update()
     {
         float mx = Input.GetAxis("Mouse X");
@@ -36,5 +42,13 @@ public class CameraRotate : MonoBehaviour
         rx = Mathf.Clamp(rx, bottomClamp, topClamp);
 
         transform.eulerAngles = new Vector3(rx, ry, 0);
+
+        for (int i = 0; i < advencedSettings.Count; i++)
+        {
+            var targetTr = advencedSettings[i].targetTr;
+            float newRx = advencedSettings[i].isRotateX ? rx : targetTr.eulerAngles.x;
+            float newRy = advencedSettings[i].isRotateY ? ry : targetTr.eulerAngles.y;
+            targetTr.eulerAngles = new Vector3(newRx, newRy, 0);
+        }
     }
 }

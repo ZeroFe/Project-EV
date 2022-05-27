@@ -6,7 +6,7 @@ public class DashEndEvent : PassiveCondition
 {
     public override void Register(GameObject target)
     {
-        target.GetComponent<PlayerCtrl>().onDashEnd += Execute;
+        target.GetComponent<PlayerCtrl>().OnDashEnd += Execute;
     }
 
     private void Execute()

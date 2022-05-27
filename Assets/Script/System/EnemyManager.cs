@@ -43,6 +43,13 @@ public class EnemyManager : MonoBehaviour
         eFSM.Init(targets[(int)eFSM.firstTarget], route);
     }
 
+    public void DrawCritical(Vector3 position)
+    {
+        var go = Instantiate(damageDrawerPrefab, position, Quaternion.identity);
+        var damagedDrawer = go.GetComponent<EnemyDamagedDrawer>();
+        damagedDrawer.SetDrawCritical(position);
+    }
+
     /// <summary>
     /// 몹이 데미지를 입을 때 출력
     /// </summary>

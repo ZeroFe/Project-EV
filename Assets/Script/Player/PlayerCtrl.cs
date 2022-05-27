@@ -23,35 +23,39 @@ public class PlayerCtrl : MonoBehaviour
     private float maxDashCooldown = 3.0f;
 
     [Header("Jump")]
-    [SerializeField] private float jumpPower = 7.0f;
+    [SerializeField] 
+    private float jumpPower = 7.0f;
     private bool isJumping = false;
-    private float gravity = -20.0f;
+    [SerializeField]
+    private float gravity = 9.81f;
     private float yVelocity = 0.0f;
-
-    [Header("Rotation")]
-    public float rotationSpeed = 200.0f;
-    [SerializeField, Tooltip("How far in degrees can you move the camera up")]
-    private float topClamp = 90.0f;
-    [SerializeField, Tooltip("How far in degrees can you move the camera down")]
-    private float bottomClamp = -90.0f;
-    private float rx = 0.0f;
-    private float ry = 0.0f;
-    private Camera _main;
 
     [Header("Attack")] 
     [SerializeField] private Weapon weapon;
     public Weapon PlayerWeapon => weapon;
 
+    [Header("Bomb Skill")]
+    public Transform shootPoint;
+    public LayerMask layer;
+    public GameObject shootCursor;
+    public LineRenderer lineVisual;
+    private Vector3 bombVelocity;
+    public Rigidbody bombPrefab;
+
+    [Header("Missile Skill")]
+    public GameObject projectilePrefab;
+
     // other
     private CharacterController cc;
+    private Camera _main;
 
     private float horizontalInput;
     private float verticalInput;
 
     // Action
-    public event Action onJump;
-    public event Action onDash;
-    public event Action onDashEnd;
+    public event Action OnJump;
+    public event Action OnDash;
+    public event Action OnDashEnd;
     
     private void Awake()
     {
@@ -72,6 +76,10 @@ public class PlayerCtrl : MonoBehaviour
         Move();
         Fire();
         Reload();
+
+        // 임시
+        FireBomb();
+        //FireHomingMissiles();
     }
 
     //private void GroundedCheck()
@@ -99,7 +107,7 @@ public class PlayerCtrl : MonoBehaviour
         Jump();
 
         // 2-4. 캐릭터 수직 속도에 중력 값을 적용한다.
-        yVelocity += gravity * Time.deltaTime;
+        yVelocity -= gravity * Time.deltaTime;
         dir.y = yVelocity;
 
         // 3. 이동 속도에 맞춰 이동한다.
@@ -140,6 +148,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         isDashing = true;
         currentDashSpeed = dashSpeed;
+        OnDash?.Invoke();
 
         float currTime = 0.0f;
         while (currentDashSpeed > 0.1f)
@@ -151,7 +160,7 @@ public class PlayerCtrl : MonoBehaviour
 
         currentDashSpeed = 0.0f;
         isDashing = false;
-        onDashEnd?.Invoke();
+        OnDashEnd?.Invoke();
     }
 
     IEnumerator RecoverDashCooldown()
@@ -194,6 +203,109 @@ public class PlayerCtrl : MonoBehaviour
             weapon.Reload();
         }
     }
+
+    #endregion
+
+    #region Skill
+
+    private void FireBomb()
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            Aim();
+        }
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            Launch(bombPrefab);
+        }
+    }
+
+    private void Aim()
+    {
+        Ray ray = new Ray(_main.transform.position, _main.transform.forward);
+        RaycastHit hit = new RaycastHit();
+
+        if (Physics.Raycast(ray, out hit, 100f, layer))
+        {
+            shootCursor.SetActive(true);
+            shootCursor.transform.position = hit.point + Vector3.up * 0.1f;
+
+            bombVelocity = Vec3Parabola.CalculateVelocity(hit.point, shootPoint.position, 0.7f);
+
+            //we include the cursor position as the final nodes for the line visual position
+            Visualize(bombVelocity, shootCursor.transform.position);
+
+            //var mySphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //mySphere.transform.localScale = Vector3(...);
+            //mySphere.transform.position = Vector3(...);
+
+
+            //transform.rotation = Quaternion.LookRotation(vo);
+        }
+    }
+
+    private Rigidbody Launch(Rigidbody projectile)
+    {
+        Rigidbody obj = Instantiate(projectile, shootPoint.position, Quaternion.identity);
+        obj.velocity = bombVelocity;
+        obj.AddTorque(bombVelocity);
+
+        shootCursor.SetActive(false);
+        lineVisual.gameObject.SetActive(false);
+
+        return obj;
+    }
+
+    //added final position argument to draw the last line node to the actual target
+    void Visualize(Vector3 vo, Vector3 finalPos)
+    {
+        int lineSegment = lineVisual.positionCount;
+        lineVisual.gameObject.SetActive(true);
+        for (int i = 0; i < lineSegment; i++)
+        {
+            Vector3 pos = Vec3Parabola.CalculatePosInTime(transform.position, vo, (i / (float)lineSegment) * 0.7f);
+            lineVisual.SetPosition(i, pos);
+        }
+
+        lineVisual.SetPosition(lineSegment, finalPos);
+    }
+
+    private void FireHomingMissiles()
+    {
+        if (Input.GetKey(KeyCode.E))
+        {
+            StartCoroutine(HomingShots());
+        }
+    }
+
+    IEnumerator HomingShots()
+    {
+        float maxBulletAngle = 45.0f;
+        int bulletCount = 7;
+        float startAngle = -maxBulletAngle;
+        float slicedAngle = (2 * maxBulletAngle) / (float)(bulletCount - 1);
+        for (int i = 0; i < bulletCount; i++)
+        {
+            var dir = transform.forward + transform.right * (i + bulletCount / 2);
+            dir.Normalize();
+            dir += transform.up;
+            dir.Normalize();
+            var go = Instantiate(projectilePrefab, transform.position + transform.forward + Vector3.up * 3, Quaternion.identity);
+            go.GetComponent<HomingMissile>().Launch(dir, 30.0f);
+
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private void CreateProjectile(float angle)
+    {
+        float angleRad = Mathf.Deg2Rad * angle;
+        var rotVec = new Vector3(angleRad, 0, 0);
+        //var rotVec = new Vector3(Mathf.Sin(angleRad), , Mathf.Cos(angleRad));
+        var go = Instantiate(projectilePrefab, transform.position, Quaternion.AngleAxis(-angle, Vector3.forward));
+        go.GetComponent<HomingMissile>().Launch(transform.forward, 30.0f);
+    }
+
 
     #endregion
 }

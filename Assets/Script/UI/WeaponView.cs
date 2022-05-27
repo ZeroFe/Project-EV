@@ -13,6 +13,7 @@ public class WeaponView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI weaponClipSize;
     [SerializeField] private TextMeshProUGUI ammoCount;
     [SerializeField] private Image reloadFill;
+    [SerializeField] private Image crosshair;
 
     private void Awake()
     {

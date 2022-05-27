@@ -70,6 +70,7 @@ public class Weapon : MonoBehaviour
     // 데미지, 효과
     public float damage = 1.0f;
     private float damageMultiplier = 1.0f;
+    public float criticalMultiplier = 1.5f;
 
     public Projectile projectilePrefab;
     public float projectileLaunchForce = 200.0f;
@@ -220,7 +221,7 @@ public class Weapon : MonoBehaviour
         //m_Source.pitch = Random.Range(0.7f, 1.0f);
         //m_Source.PlayOneShot(FireAudioClip);
 
-        //CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
+        CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
 
         OnFire?.Invoke();
         // 발사 
@@ -258,8 +259,11 @@ public class Weapon : MonoBehaviour
         RaycastHit hit;
         Ray r = Camera.main.ViewportPointToRay(Vector3.one * 0.5f + (Vector3)spread);
         Vector3 hitPosition = r.origin + r.direction * 200.0f;
-        
-        if (Physics.Raycast(r, out hit, 1000.0f, ~(1 << LayerMask.NameToLayer("Player")), QueryTriggerInteraction.Ignore))
+        int layerMask = (1 << LayerMask.NameToLayer("Player")) | 
+                        (1 << LayerMask.NameToLayer("PlayerProjectile")) | 
+                        (1 << LayerMask.NameToLayer("EnemyProjectile"));
+
+        if (Physics.Raycast(r, out hit, 1000.0f, ~layerMask, QueryTriggerInteraction.Ignore))
         {
             Renderer renderer = hit.collider.GetComponentInChildren<Renderer>();
             //ImpactManager.Instance.PlayImpact(hit.point, hit.normal, renderer == null ? null : renderer.sharedMaterial);
@@ -269,15 +273,21 @@ public class Weapon : MonoBehaviour
             if (hit.distance > 5.0f)
                 hitPosition = hit.point;
 
-            Debug.Log("Raycast shot hit");
             //this is a target
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 // TODO : UseEffect 주기
-                var targetStatus = hit.collider.gameObject.GetComponent<EnemyStatus>();
+                var targetStatus = hit.collider.gameObject.GetComponentInParent<EnemyStatus>();
                 if (targetStatus)
                 {
-                    targetStatus.TakeDamage((int)(ownerStatus.attackPower * damageMultiplier));
+                    float attackPower = ownerStatus.attackPower * damageMultiplier;
+                    if (hit.collider.gameObject.CompareTag("Critical"))
+                    {
+                        print("Critical");
+                        EnemyManager.Instance.DrawCritical(hit.point);
+                        attackPower *= criticalMultiplier;
+                    }
+                    targetStatus.TakeDamage((int)attackPower);
                 }
                 else
                 {
