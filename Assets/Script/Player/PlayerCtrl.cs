@@ -259,7 +259,7 @@ public class PlayerCtrl : MonoBehaviour
     //added final position argument to draw the last line node to the actual target
     void Visualize(Vector3 vo, Vector3 finalPos)
     {
-        int lineSegment = lineVisual.positionCount;
+        int lineSegment = lineVisual.positionCount - 1;
         lineVisual.gameObject.SetActive(true);
         for (int i = 0; i < lineSegment; i++)
         {
