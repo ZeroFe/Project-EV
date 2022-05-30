@@ -130,7 +130,7 @@ MonoBehaviour:
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   duration: 0.3
   intensities: {x: 2, y: 8}
-  minimapSpawnIndicatorPrefab: {fileID: 9078118124602908278, guid: df0c01836cb5ecd4b8232a849a5f56ae, type: 3}
+  minimapSpawnIndicatorPrefab: {fileID: 345606942978692663, guid: 977af7b1753b2d8439e5aa975940bd0e, type: 3}
   spawnPosTr: {fileID: 1713704309844700441}
   spawnSound: {fileID: 8300000, guid: 86a3c9ab687d22449b411965745c754a, type: 3}
 --- !u!1 &8368847229585980056

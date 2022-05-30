@@ -7,12 +7,9 @@ using DG.Tweening;
 
 public class SpiderFSM : EnemyFSM
 {
-    float currentTime = 0;
-    float attackDelay = 2f;
-
     public override void OnAttackHit()
     {
-        RaycastHit hit;
+        AudioManager.Instance.PlaySFX(attackSound, transform.position);
         if (IsInAttackDistance())
         {
             attackTarget.GetComponent<CharacterStatus>().TakeDamage(status.attackPower);

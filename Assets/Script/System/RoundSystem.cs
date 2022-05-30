@@ -5,9 +5,10 @@ using UnityEngine;
 using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine.UI;
+using Sequence = DG.Tweening.Sequence;
 
-// µğ¹ö±×¸¦ À§ÇØ ÀÇµµÀûÀ¸·Î DisallowMultipleComponent´Â ³ÖÁö ¾Ê´Â´Ù
-// ¿©·¯ µğ¹ö±×¿ë Round¸¦ Á¦ÀÛÇØ¾ßÇÒ ¼öµµ ÀÖ±â ¶§¹®
+// ë””ë²„ê·¸ë¥¼ ìœ„í•´ ì˜ë„ì ìœ¼ë¡œ DisallowMultipleComponentëŠ” ë„£ì§€ ì•ŠëŠ”ë‹¤
+// ì—¬ëŸ¬ ë””ë²„ê·¸ìš© Roundë¥¼ ì œì‘í•´ì•¼í•  ìˆ˜ë„ ìˆê¸° ë•Œë¬¸
 public class RoundSystem : MonoBehaviour
 {
     public static RoundSystem Instance { get; private set; }
@@ -26,15 +27,14 @@ public class RoundSystem : MonoBehaviour
     private int remainEnemyCount = 0;
 
     [Header("UI")] 
-    [SerializeField] private Image WarningUI;
+    [SerializeField] private GameObject WarningUI;
+    [SerializeField]
+    private float warningDuration = 0.5f;
     [SerializeField] private Image SafeUI;
     public GameObject GameClearUI;
 
     [Header("Sound")] 
     [SerializeField] private AudioClip RoundStartSound;
-
-    private bool isWarningAnimation = false;
-    private bool isSafeAnimation = false;
 
     private void Awake()
     {
@@ -44,8 +44,8 @@ public class RoundSystem : MonoBehaviour
 
     public void Start()
     {
-        // ¿ø·¡´Â °ÔÀÓ ½ÃÀÛ ½Ã ¹«±â¸¦ ¼±ÅÃÇÑ ÈÄ, ¶ó¿îµå¸¦ ½ÃÀÛÇØ¾ß ÇÔ
-        // ÀÏ´Ü °£ÀÌ Å×½ºÆ®·Î ½ÃÀÛÇÏÀÚ¸¶ÀÚ ¶ó¿îµå ÁøÇà
+        // ì›ë˜ëŠ” ê²Œì„ ì‹œì‘ ì‹œ ë¬´ê¸°ë¥¼ ì„ íƒí•œ í›„, ë¼ìš´ë“œë¥¼ ì‹œì‘í•´ì•¼ í•¨
+        // ì¼ë‹¨ ê°„ì´ í…ŒìŠ¤íŠ¸ë¡œ ì‹œì‘í•˜ìë§ˆì ë¼ìš´ë“œ ì§„í–‰
         NextRound();
     }
 
@@ -56,20 +56,20 @@ public class RoundSystem : MonoBehaviour
 
     public void CheckRoundEnd()
     {
-        // ¸÷ÀÌ À½¼ö °³¸¸Å­ Á¸ÀçÇØ¼± ¾È µÈ´Ù
+        // ëª¹ì´ ìŒìˆ˜ ê°œë§Œí¼ ì¡´ì¬í•´ì„  ì•ˆ ëœë‹¤
         Debug.Assert(remainEnemyCount >= 0 && currentEnemyCount >= 0);
 
         currentEnemyCount--;
         Debug.Log($"remain enemy Count : {remainEnemyCount}, current enemy Count : " + currentEnemyCount);
         if (remainEnemyCount == 0 && currentEnemyCount == 0)
         {
-            // °ÔÀÓ ³¡³µ³ª Ã¼Å©
+            // ê²Œì„ ëë‚¬ë‚˜ ì²´í¬
             if (currentRoundIndex == rounds.Count - 1)
             {
-                // °ÔÀÓ ³¡³µÀ¸¸é °ÔÀÓ ¿Ï·á Ã³¸®
+                // ê²Œì„ ëë‚¬ìœ¼ë©´ ê²Œì„ ì™„ë£Œ ì²˜ë¦¬
                 WindowSystem.Instance.OpenWindow(GameClearUI, false);
             }
-            // ¾Æ´Ï¸é ¾÷±×·¹ÀÌµå ¶ç¿ì±â
+            // ì•„ë‹ˆë©´ ì—…ê·¸ë ˆì´ë“œ ë„ìš°ê¸°
             else
             {
                 StartCoroutine(SafeAnimation());
@@ -77,46 +77,40 @@ public class RoundSystem : MonoBehaviour
         }
     }
 
-    // ´ÙÀ½ ¶ó¿îµå ½ÃÀÛ
+    #region Battle
+
+    // ë‹¤ìŒ ë¼ìš´ë“œ ì‹œì‘
     public void NextRound()
     {
-        AudioManager.Instance.PlayBGM(AudioManager.BgmType.Battle);
+        // ê²Œì„ ì‹œì‘ ì•Œë¦¼ìŒ
         AudioManager.Instance.PlaySfxNonSpatial(RoundStartSound, 0.75f);
-        StartCoroutine(WarningAnimation());
-    }
 
-    IEnumerator WarningAnimation()
-    {
-        // ¶ó¿îµå ½ÃÀÛ ¾Ö´Ï¸ŞÀÌ¼Ç
-        Color c = WarningUI.color;
-        for (float alpha = 0; alpha < 1; alpha += 0.1f)
+        WarningUI.SetActive(true);
+        var rectTransform = WarningUI.GetComponent<RectTransform>();
+        var group = WarningUI.GetComponent<CanvasGroup>();
+
+        // Animation
+        Sequence s = DOTween.Sequence();
+        var origin = rectTransform.sizeDelta;
+        rectTransform.sizeDelta = new Vector2(0, origin.y);
+        s.Append(rectTransform.DOSizeDelta(origin, warningDuration));
+        s.Append(group.DOFade(0.0f, warningDuration).SetLoops(4));
+
+        s.onComplete = () =>
         {
-            c.a = alpha;
-            WarningUI.color = c;
-            yield return new WaitForSeconds(0.1f);
-        }
-        c.a = 1.0f;
-        WarningUI.color = c;
+            WarningUI.SetActive(false);
 
-        for (float alpha = 1.0f; alpha > 0; alpha -= 0.1f)
-        {
-            c.a = alpha;
-            WarningUI.color = c;
-            yield return new WaitForSeconds(0.1f);
-        }
-        c.a = 0.0f;
-        WarningUI.color = c;
+            currentRoundIndex++;
+            // ë¦¬ìŠ¤íŠ¸ì—ì„œ ë¼ìš´ë“œ ì •ë³´ë¥¼ ì½ê³  ì‹œì‘í•œë‹¤
+            CurrentRound = rounds[currentRoundIndex];
 
-        currentRoundIndex++;
-        // ¸®½ºÆ®¿¡¼­ ¶ó¿îµå Á¤º¸¸¦ ÀĞ°í ½ÃÀÛÇÑ´Ù
-        CurrentRound = rounds[currentRoundIndex];
-
-        SpawnStart();
+            SpawnStart();
+        };
     }
 
     IEnumerator SafeAnimation()
     {
-        // ¶ó¿îµå ³¡ ¾Ö´Ï¸ŞÀÌ¼Ç
+        // ë¼ìš´ë“œ ë ì• ë‹ˆë©”ì´ì…˜
         Color c = SafeUI.color;
         for (float alpha = 0; alpha < 1; alpha += 0.1f)
         {
@@ -136,15 +130,17 @@ public class RoundSystem : MonoBehaviour
         c.a = 0.0f;
         SafeUI.color = c;
 
-        // ¾÷±×·¹ÀÌµå ÇÒ ¼ö ÀÖ´Ù ¶ç¿ì°í À©µµ¿ì ¶ç¿ì±â
+        // ì—…ê·¸ë ˆì´ë“œ í•  ìˆ˜ ìˆë‹¤ ë„ìš°ê³  ìœˆë„ìš° ë„ìš°ê¸°
         WindowSystem.Instance.OpenWindow(UpgradeWindow.Instance.gameObject, false);
         UpgradeWindow.Instance.SetUpgradeWindow(EnhanceSystem.Instance.GetRandomEnhances(3));
     }
 
     private void SpawnStart()
     {
+        AudioManager.Instance.PlayBGM(AudioManager.BgmType.Battle);
+
         var enemySpawns = CurrentRound.enemySpawns;
-        // Ã³À½ ½ÃÀÛÇÒ ¶§ spawn Wait TimeÀ» ½ÃÀÛ ½Ã°£À¸·Î ¸ÂÃá´Ù
+        // ì²˜ìŒ ì‹œì‘í•  ë•Œ spawn Wait Timeì„ ì‹œì‘ ì‹œê°„ìœ¼ë¡œ ë§ì¶˜ë‹¤
         foreach (var enemySpawn in enemySpawns)
         {
             remainEnemyCount += enemySpawn.Count;
@@ -190,6 +186,24 @@ public class RoundSystem : MonoBehaviour
         enemy.GetComponent<EnemyStatus>().PowerUp(enemySpawn.enemyPowerupRate);
         currentEnemyCount++;
     }
+
+    #endregion
+
+    #region Upgrade
+
+    private void Upgrade()
+    {
+        // ì—…ê·¸ë ˆì´ë“œ ê°€ëŠ¥ ì—°ì¶œ
+
+
+        // ì—…ê·¸ë ˆì´ë“œ í•  ìˆ˜ ìˆë‹¤ ë„ìš°ê³  ìœˆë„ìš° ë„ìš°ê¸°
+        AudioManager.Instance.PlayBGM(AudioManager.BgmType.Upgrade);
+        WindowSystem.Instance.OpenWindow(UpgradeWindow.Instance.gameObject, false);
+        UpgradeWindow.Instance.SetUpgradeWindow(EnhanceSystem.Instance.GetRandomEnhances(3));
+    }
+
+    #endregion
+
 
     #region Debug
 

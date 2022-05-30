@@ -53,17 +53,14 @@ public class SpawnNotifier : MonoBehaviour
         {
             light.color = warnColor;
             Sequence s = DOTween.Sequence();
-            // Add an horizontal relative move tween that will last the whole Sequence's duration
             s.Append(light.DOIntensity(intensities.y, halfDuration));
             s.Insert(halfDuration, light.DOIntensity(intensities.x, halfDuration));
-            // Insert a rotation tween which will last half the duration
-            // and will loop forward and backward twice
-            //s.Insert(0, cube.DORotate(new Vector3(0, 45, 0), duration / 2).SetEase(Ease.InQuad).SetLoops(2, LoopType.Yoyo));
-            // Add a color tween that will start at half the duration and last until the end
-            //s.Insert(duration / 2, cube.GetComponent<Renderer>().material.DOColor(Color.yellow, duration / 2));
-            // Set the whole Sequence to loop infinitely forward and backwards
             s.SetLoops(6, LoopType.Yoyo);
-            s.onComplete = () => { light.color = normalColor; };
+            s.onComplete = () =>
+            {
+                light.color = normalColor;
+                light.intensity = (intensities.x + intensities.y) / 2;
+            };
         }
     }
 }
