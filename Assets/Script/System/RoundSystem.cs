@@ -30,11 +30,11 @@ public class RoundSystem : MonoBehaviour
     [SerializeField] private Image SafeUI;
     public GameObject GameClearUI;
 
+    [Header("Sound")] 
+    [SerializeField] private AudioClip RoundStartSound;
+
     private bool isWarningAnimation = false;
     private bool isSafeAnimation = false;
-
-    [SerializeField]
-    private GameObject spawnIndicatorPrefab;
 
     private void Awake()
     {
@@ -80,6 +80,8 @@ public class RoundSystem : MonoBehaviour
     // 다음 라운드 시작
     public void NextRound()
     {
+        AudioManager.Instance.PlayBGM(AudioManager.BgmType.Battle);
+        AudioManager.Instance.PlaySfxNonSpatial(RoundStartSound, 0.75f);
         StartCoroutine(WarningAnimation());
     }
 
@@ -155,8 +157,7 @@ public class RoundSystem : MonoBehaviour
     {
         yield return new WaitForSeconds(enemySpawn.startTime);
         print("Start Spawn");
-        var spawnIndicator = Instantiate(spawnIndicatorPrefab);
-        spawnIndicator.transform.position = enemySpawn.routeObject.transform.position;
+        enemySpawn.spawnPos.NotifySpawn();
 
         if (enemySpawn.spawnType == Round.EnemySpawn.SpawnType.Sequence)
         {
@@ -167,7 +168,7 @@ public class RoundSystem : MonoBehaviour
                 remainCount--;
                 remainEnemyCount--;
                 yield return new WaitForSeconds(enemySpawn.intervalScaleCurve.Evaluate(
-                    (float)enemySpawn.remainCount / enemySpawn.Count) * enemySpawn.interval);
+                    (float)remainCount / enemySpawn.Count) * enemySpawn.interval);
             }
         }
         else if (enemySpawn.spawnType == Round.EnemySpawn.SpawnType.Emission)
@@ -185,7 +186,7 @@ public class RoundSystem : MonoBehaviour
     private void CreateEnemy(Round.EnemySpawn enemySpawn)
     {
         var enemy = Instantiate(enemySpawn.enemyPrefab);
-        EnemyManager.Instance.InitEnemy(enemy, enemySpawn.routeObject);
+        EnemyManager.Instance.InitEnemy(enemy, enemySpawn.spawnPos.gameObject);
         enemy.GetComponent<EnemyStatus>().PowerUp(enemySpawn.enemyPowerupRate);
         currentEnemyCount++;
     }

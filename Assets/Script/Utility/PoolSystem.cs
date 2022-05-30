@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -9,6 +10,11 @@ using Object = UnityEngine.Object;
 public class PoolSystem : MonoBehaviour
 {
     public static PoolSystem Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     public static void Create()
     {
@@ -60,7 +66,7 @@ public class PoolSystem : MonoBehaviour
         UnityEngine.Debug.LogError("No pool was init with this prefab");
         return null;
     }
-    
+
     static void SetActive(Object obj, bool active)
     {
         GameObject go = null;

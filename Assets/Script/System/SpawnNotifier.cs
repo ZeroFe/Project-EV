@@ -1,0 +1,69 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using DG.Tweening;
+
+/// <summary>
+/// 각 입구에서 적이 출현하면 경고를 띄우고 알림을 보냄
+/// </summary>
+public class SpawnNotifier : MonoBehaviour
+{
+    [Header("Wall Light")]
+    // 벽면 조명만 
+    private Light[] wallLights;
+    [SerializeField]
+    private Color warnColor = Color.red;
+    [SerializeField]
+    private Color normalColor = Color.white;
+    [SerializeField] private float duration = 0.5f;
+    private float halfDuration;
+    [SerializeField] private Vector2 intensities;
+
+    [Header("Others")]
+    [SerializeField, Tooltip("미니맵에 적이 스폰됐음을 알리는 표시 ")] 
+    private GameObject minimapSpawnIndicatorPrefab;
+    [SerializeField, Tooltip("생성 위치 표시")]
+    private Transform spawnPosTr;
+    [SerializeField, Tooltip("알림 경고음")] 
+    private AudioClip spawnSound;
+
+    public Transform SpawnPosTr => spawnPosTr;
+
+    void Awake()
+    {
+        wallLights = GetComponentsInChildren<Light>();
+        foreach (var light in wallLights)
+        {
+            print(light.gameObject.name);
+        }
+
+        Debug.Assert(spawnPosTr, $"Error : not set spawn pos tr in {gameObject.name}");
+        Debug.Assert(minimapSpawnIndicatorPrefab, $"Error : not set minimap spawn indicator in {gameObject.name}");
+        Debug.Assert(spawnSound, $"Error : not set spawn sound in {gameObject.name}");
+
+        halfDuration = duration / 2;
+    }
+
+    public void NotifySpawn()
+    {
+        AudioManager.Instance.PlaySfxNonSpatial(spawnSound);
+        var spawnIndicator = Instantiate(minimapSpawnIndicatorPrefab);
+        spawnIndicator.transform.position = spawnPosTr.position;
+        foreach (var light in wallLights)
+        {
+            light.color = warnColor;
+            Sequence s = DOTween.Sequence();
+            // Add an horizontal relative move tween that will last the whole Sequence's duration
+            s.Append(light.DOIntensity(intensities.y, halfDuration));
+            s.Insert(halfDuration, light.DOIntensity(intensities.x, halfDuration));
+            // Insert a rotation tween which will last half the duration
+            // and will loop forward and backward twice
+            //s.Insert(0, cube.DORotate(new Vector3(0, 45, 0), duration / 2).SetEase(Ease.InQuad).SetLoops(2, LoopType.Yoyo));
+            // Add a color tween that will start at half the duration and last until the end
+            //s.Insert(duration / 2, cube.GetComponent<Renderer>().material.DOColor(Color.yellow, duration / 2));
+            // Set the whole Sequence to loop infinitely forward and backwards
+            s.SetLoops(6, LoopType.Yoyo);
+            s.onComplete = () => { light.color = normalColor; };
+        }
+    }
+}

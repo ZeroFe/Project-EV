@@ -51,6 +51,11 @@ public abstract class EnemyFSM : MonoBehaviour
     [SerializeField, Tooltip("시체 사라지는 속도")]
     public float deathTime = 0.5f;
 
+    [Header("SFX")] 
+    [SerializeField] protected AudioClip attackSound;
+    [SerializeField] protected AudioClip reactSound;
+    [SerializeField] protected AudioClip deathSound;
+
     // 모든 몬스터는 기본적으로 기지를 공격해야 한다
     protected GameObject originTarget;
     // 공격 대상 : 인식 범위에 들어가면 공격 대상이 변경되므로 따로 저장한다
@@ -217,7 +222,8 @@ public abstract class EnemyFSM : MonoBehaviour
 
     public virtual void OnAttackHit()
     {
-        RaycastHit hit;
+        AudioManager.Instance.PlaySfxNonSpatial(attackSound);
+        //AudioManager.Instance.PlaySFX(attackSound, transform.position);
         if (IsInAttackDistance())
         {
             attackTarget.GetComponent<CharacterStatus>().TakeDamage(status.attackPower);
@@ -250,6 +256,7 @@ public abstract class EnemyFSM : MonoBehaviour
         float lostHpRate = (float) amount / status.MaxHp;
         if (lostHpRate > hurtReactRate)
         {
+            AudioManager.Instance.PlaySFX(reactSound, transform.position);
             print("Damaged Animation");
             agent.isStopped = true;
             if (lostHpRate > knockbackReactRate)
@@ -303,6 +310,7 @@ public abstract class EnemyFSM : MonoBehaviour
     /// </summary>
     protected virtual void OnDead()
     {
+        AudioManager.Instance.PlaySFX(deathSound, transform.position);
         print("Enemy FSM On Dead");
         agent.isStopped = true;
         hitCollider.enabled = false;

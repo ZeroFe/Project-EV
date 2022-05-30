@@ -71,11 +71,7 @@ public class Projectile : MonoBehaviour
         m_Owner.ReturnProjectile(this);
 
         // 소리 출력
-        var source = WorldAudioPool.GetWorldSFXSource();
-
-        source.transform.position = position;
-        source.pitch = Random.Range(0.8f, 1.1f);
-        source.PlayOneShot(DestroyedSound);
+        AudioManager.Instance.PlaySFX(DestroyedSound, transform.position);
     }
 
     void Update()

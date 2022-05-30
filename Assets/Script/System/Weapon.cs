@@ -75,6 +75,7 @@ public class Weapon : MonoBehaviour
     public Projectile projectilePrefab;
     public float projectileLaunchForce = 200.0f;
 
+    //public AudioClip 
     public GameObject bulletEffectPrefab;
     public ParticleSystem muzzleEffect;
     public float muzzleEffectTime = 0.05f;

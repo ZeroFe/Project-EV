@@ -282,6 +282,9 @@ MonoBehaviour:
   hurtReactRate: 0.15
   knockbackReactRate: 0.3
   deathTime: 2.5
+  attackSound: {fileID: 8300000, guid: 9342294d6c25e2c4e8f627aea1a07572, type: 3}
+  reactSound: {fileID: 8300000, guid: 6db58d5050a4f1d44927d6a46ed71a2e, type: 3}
+  deathSound: {fileID: 8300000, guid: 8ed2aa5dd6aaabe4487cc31c0e9aaea7, type: 3}
   renderer: {fileID: 3311141978419786703}
 --- !u!195 &6690722257769097224
 NavMeshAgent:

@@ -53,10 +53,10 @@ public class ImpactManager : MonoBehaviour
         sys.gameObject.SetActive(true);
         sys.Play();
 
-        var source = WorldAudioPool.GetWorldSFXSource();
+        //var source = WorldAudioPool.GetWorldSFXSource();
 
-        source.transform.position = position;
-        source.pitch = Random.Range(0.8f, 1.1f);
-        source.PlayOneShot(setting.ImpactSound);
+        //source.transform.position = position;
+        //source.pitch = Random.Range(0.8f, 1.1f);
+        //source.PlayOneShot(setting.ImpactSound);
     }
 }

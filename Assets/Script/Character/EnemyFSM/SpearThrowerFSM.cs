@@ -15,6 +15,7 @@ public class SpearThrowerFSM : EnemyFSM
     public override void OnAttackHit()
     {
         // 창 던지기
+        AudioManager.Instance.PlaySFX(attackSound, transform.position);
         var spear = Instantiate(spearPrefab, shootPosTr.position, Quaternion.LookRotation(transform.forward));
         var projectile = spear.GetComponent<SpearProjectile>();
         if (projectile != null)

@@ -359,6 +359,9 @@ MonoBehaviour:
   hurtReactRate: 0.15
   knockbackReactRate: 0.3
   deathTime: 0.5
+  attackSound: {fileID: 8300000, guid: f3bc7b0bbf32db448a9a4ffcc5c3b728, type: 3}
+  reactSound: {fileID: 8300000, guid: 9016723f86ff20e4898b7ae099a60964, type: 3}
+  deathSound: {fileID: 8300000, guid: 76de36dc51110024ba4e9bdaa8fdb2ed, type: 3}
   renderer: {fileID: 0}
   spearPrefab: {fileID: 2730943322841007739, guid: 6a354e82c302b44418f1bafab5c4610b, type: 3}
   shootPosTr: {fileID: 4580820319966344422}

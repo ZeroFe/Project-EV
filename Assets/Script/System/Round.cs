@@ -21,8 +21,8 @@ public class Round
             Emission,
         }
 
-        [Tooltip("몬스터가 어느 경로로 움직일지 지정")]
-        public GameObject routeObject;
+        [Tooltip("몬스터가 어디서 나올지")]
+        public SpawnNotifier spawnPos;
 
         public SpawnType spawnType = SpawnType.Sequence;
         [Tooltip("어떤 몬스터를 생성할지")]
@@ -43,12 +43,6 @@ public class Round
         public float enemyPowerupRate = 1.2f;
         // 돌연변이 확률
         //public float enemyMutateChance = 0.0f;
-
-
-        [Header("For Spawn")]
-        // 디버그용으로 public으로 냅두고, 이후 HideInspector를 적용해서 안 보이게 한다
-        public float spawnWaitTime = 0.0f;
-        public int remainCount = 10;
 
         public int Count => count;
     }

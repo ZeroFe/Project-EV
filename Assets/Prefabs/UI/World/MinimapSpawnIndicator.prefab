@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6526719778443115681}
   - component: {fileID: 264864115280104251}
   m_Layer: 6
-  m_Name: EnemyMinimapIndicator
+  m_Name: MinimapSpawnIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
