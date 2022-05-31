@@ -32,10 +32,6 @@ public class SpawnNotifier : MonoBehaviour
     void Awake()
     {
         wallLights = GetComponentsInChildren<Light>();
-        foreach (var light in wallLights)
-        {
-            print(light.gameObject.name);
-        }
 
         Debug.Assert(spawnPosTr, $"Error : not set spawn pos tr in {gameObject.name}");
         Debug.Assert(minimapSpawnIndicatorPrefab, $"Error : not set minimap spawn indicator in {gameObject.name}");

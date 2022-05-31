@@ -11,6 +11,6 @@ public class HpBarTextExtend : HpBar
     public override void Draw(int current, int max)
     {
         base.Draw(current, max);
-        hpText.text = $"{current} / {max}";
+        hpText.text = current.ToString();
     }
 }

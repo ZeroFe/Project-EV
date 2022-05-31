@@ -45,6 +45,13 @@ public class AudioManager : MonoBehaviour
         bgm.Play(0);
     }
 
+    public void StopBGM()
+    {
+        bgm.Stop();
+        bgm.clip = null;
+    }
+
+
     #endregion
 
     #region SFX

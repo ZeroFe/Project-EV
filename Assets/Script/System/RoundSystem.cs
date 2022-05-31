@@ -30,11 +30,14 @@ public class RoundSystem : MonoBehaviour
     [SerializeField] private GameObject WarningUI;
     [SerializeField]
     private float warningDuration = 0.5f;
-    [SerializeField] private Image SafeUI;
+    [SerializeField] private Image SafeImage;
+    [SerializeField] private float safeDrawDuration = 0.5f;
     public GameObject GameClearUI;
 
     [Header("Sound")] 
     [SerializeField] private AudioClip RoundStartSound;
+
+    [SerializeField] private AudioClip UpgradeStartSound;
 
     private void Awake()
     {
@@ -72,7 +75,7 @@ public class RoundSystem : MonoBehaviour
             // 아니면 업그레이드 띄우기
             else
             {
-                StartCoroutine(SafeAnimation());
+                Upgrade();
             }
         }
     }
@@ -83,6 +86,7 @@ public class RoundSystem : MonoBehaviour
     public void NextRound()
     {
         // 게임 시작 알림음
+        AudioManager.Instance.StopBGM();
         AudioManager.Instance.PlaySfxNonSpatial(RoundStartSound, 0.75f);
 
         WarningUI.SetActive(true);
@@ -106,33 +110,6 @@ public class RoundSystem : MonoBehaviour
 
             SpawnStart();
         };
-    }
-
-    IEnumerator SafeAnimation()
-    {
-        // 라운드 끝 애니메이션
-        Color c = SafeUI.color;
-        for (float alpha = 0; alpha < 1; alpha += 0.1f)
-        {
-            c.a = alpha;
-            SafeUI.color = c;
-            yield return new WaitForSeconds(0.1f);
-        }
-        c.a = 0.0f;
-        SafeUI.color = c;
-
-        for (float alpha = 1.0f; alpha > 0; alpha -= 0.1f)
-        {
-            c.a = alpha;
-            SafeUI.color = c;
-            yield return new WaitForSeconds(0.1f);
-        }
-        c.a = 0.0f;
-        SafeUI.color = c;
-
-        // 업그레이드 할 수 있다 띄우고 윈도우 띄우기
-        WindowSystem.Instance.OpenWindow(UpgradeWindow.Instance.gameObject, false);
-        UpgradeWindow.Instance.SetUpgradeWindow(EnhanceSystem.Instance.GetRandomEnhances(3));
     }
 
     private void SpawnStart()
@@ -193,13 +170,27 @@ public class RoundSystem : MonoBehaviour
 
     private void Upgrade()
     {
-        // 업그레이드 가능 연출
+        // 라운드 끝남 알림음
+        AudioManager.Instance.StopBGM();
+        AudioManager.Instance.PlaySfxNonSpatial(UpgradeStartSound, 0.75f);
+        
+        SafeImage.gameObject.SetActive(true);
+        SafeImage.fillAmount = 0.0f;
+        var group = SafeImage.GetComponent<CanvasGroup>();
+        group.alpha = 1.0f;
 
+        // Animation
+        Sequence s = DOTween.Sequence();
+        s.Append(SafeImage.DOFillAmount(1.0f, safeDrawDuration));
+        s.Insert(safeDrawDuration + 4.0f, group.DOFade(0.0f, safeDrawDuration / 2));
 
-        // 업그레이드 할 수 있다 띄우고 윈도우 띄우기
-        AudioManager.Instance.PlayBGM(AudioManager.BgmType.Upgrade);
-        WindowSystem.Instance.OpenWindow(UpgradeWindow.Instance.gameObject, false);
-        UpgradeWindow.Instance.SetUpgradeWindow(EnhanceSystem.Instance.GetRandomEnhances(3));
+        s.onComplete = () =>
+        {
+            // 업그레이드 할 수 있다 띄우고 윈도우 띄우기
+            AudioManager.Instance.PlayBGM(AudioManager.BgmType.Upgrade);
+            WindowSystem.Instance.OpenWindow(UpgradeWindow.Instance.gameObject, false);
+            UpgradeWindow.Instance.SetUpgradeWindow(EnhanceSystem.Instance.GetRandomEnhances(3));
+        };
     }
 
     #endregion

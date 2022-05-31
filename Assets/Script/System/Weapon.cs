@@ -196,7 +196,8 @@ public class Weapon : MonoBehaviour
 
     private void Start()
     {
-        WeaponView.Instance.UpdateClipInfo(ClipSize);
+        WeaponView.Instance.UpdateAmmo(clipSize);
+        //WeaponView.Instance.UpdateClipInfo(ClipSize);
         WeaponView.Instance.UpdateAmmoCount(CurrentAmmoCount);
     }
 

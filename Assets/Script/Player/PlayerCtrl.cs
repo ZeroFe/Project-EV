@@ -73,13 +73,16 @@ public class PlayerCtrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Move();
-        Fire();
-        Reload();
+        if (Time.timeScale != 0)
+        {
+            Move();
+            Fire();
+            Reload();
 
-        // 임시
-        FireBomb();
-        //FireHomingMissiles();
+            // 임시
+            FireBomb();
+            //FireHomingMissiles();
+        }
     }
 
     //private void GroundedCheck()

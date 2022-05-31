@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,8 +14,12 @@ using UnityEngine;
 /// ESC로 윈도우를 끄거나 커서를 보이게 하는 등의 관리를 한다
 /// </summary>
 [DisallowMultipleComponent]
-public class WindowSystem : Singleton<WindowSystem>
+public class WindowSystem : MonoBehaviour
 {
+    public static WindowSystem Instance { get; private set; }
+
+    //public Texture2D
+
     class WindowClass
     {
         public GameObject windowObject;
@@ -31,9 +36,15 @@ public class WindowSystem : Singleton<WindowSystem>
     // 끌 수 없는 윈도우를 구분
     private Stack<WindowClass> windowStack = new Stack<WindowClass>();
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
         Debug.Log("Window System Actived");
+        //Cursor.SetCursor();
         // 게임 시작 시 윈도우는 전부 비활성화 상태이므로 커서를 안 보여줘야 한다
         SetCursorDisplay(false);
     }

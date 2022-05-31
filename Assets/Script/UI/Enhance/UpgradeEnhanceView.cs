@@ -13,25 +13,34 @@ public class UpgradeEnhanceView : MonoBehaviour,
     [SerializeField] private Image thumbnail;
     [SerializeField] private TextMeshProUGUI name;
     [SerializeField] private TextMeshProUGUI description;
-    private Outline selectOutline;
+
+    [SerializeField] private GameObject selectFrame;
+    [SerializeField] private GameObject selectTopStar;
+    [SerializeField] private GameObject selectBottomStar;
+
+    [SerializeField] private AudioClip pointEnterSound;
 
     public Action<Enhance> SelectEnhanceHandler;
     private Enhance upgradeEnhance;
 
     private void Awake()
     {
-        selectOutline = GetComponent<Outline>();
-        selectOutline.enabled = false;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        selectOutline.enabled = true;
+        Debug.Log("Point Enter");
+        selectFrame.SetActive(true);
+        selectTopStar.SetActive(true);
+        selectBottomStar.SetActive(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        selectOutline.enabled = false;
+        Debug.Log("Point Exit");
+        selectFrame.SetActive(false);
+        selectTopStar.SetActive(false);
+        selectBottomStar.SetActive(false);
     }
 
     public void OnPointerDown(PointerEventData eventData)

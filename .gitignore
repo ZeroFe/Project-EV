@@ -64,7 +64,7 @@ crashlytics-build.properties
 # ignore Project Setting
 /ProjectSettings/ProjectVersion.txt
 /UserSettings/Layouts/default-2021.dwlt
-/Assets/Fonts
-/Assets/Fonts.meta
+/Assets/Fonts/SDF
+/Assets/Fonts/SDF.meta
 /Assets/External
 /Assets/External.meta
