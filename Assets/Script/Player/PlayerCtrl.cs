@@ -9,6 +9,8 @@ public class PlayerCtrl : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5.0f;
+    [SerializeField] private AudioClip[] moveSounds;
+    private int previousMoveSound = -1;
     
     private float finalSpeed;
 
@@ -16,6 +18,7 @@ public class PlayerCtrl : MonoBehaviour
     [SerializeField] private float dashSpeed = 10.0f;
     [SerializeField] private AnimationCurve DashSpeedCurve;
     [SerializeField] private int maxDashCount = 2;
+    [SerializeField] private AudioClip dashSound;
     private float currentDashSpeed = 0.0f;
     private bool isDashing = false;
     private int currentDashCount = 1;
@@ -29,6 +32,7 @@ public class PlayerCtrl : MonoBehaviour
     [SerializeField]
     private float gravity = 9.81f;
     private float yVelocity = 0.0f;
+    [SerializeField] private AudioClip jumpSound;
 
     [Header("Attack")] 
     [SerializeField] private Weapon weapon;
@@ -119,14 +123,12 @@ public class PlayerCtrl : MonoBehaviour
 
     private void Jump()
     {
-        // 2-2. 만일, 점프 중이었고, 다시 바닥에 착지했다면...
         if (isJumping && cc.collisionFlags == CollisionFlags.Below)
         {
             isJumping = false;
             yVelocity = 0;
         }
-
-        // 2-3. 만일, 키보드 <Space> 버튼을 입력했고, 점프를 안 한 상태라면...
+        
         if (Input.GetButtonDown("Jump") && !isJumping)
         {
             yVelocity = jumpPower;
@@ -136,9 +138,9 @@ public class PlayerCtrl : MonoBehaviour
 
     private void CheckDash()
     {
+        // Dash 키 누름
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            // Dash 키 누름
             if (!isDashing && currentDashCount > 0)
             {
                 currentDashCount--;

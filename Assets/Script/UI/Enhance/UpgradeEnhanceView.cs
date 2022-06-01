@@ -19,6 +19,7 @@ public class UpgradeEnhanceView : MonoBehaviour,
     [SerializeField] private GameObject selectBottomStar;
 
     [SerializeField] private AudioClip pointEnterSound;
+    [SerializeField] private AudioSource audioSource;
 
     public Action<Enhance> SelectEnhanceHandler;
     private Enhance upgradeEnhance;
@@ -30,6 +31,7 @@ public class UpgradeEnhanceView : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Point Enter");
+        audioSource.PlayOneShot(pointEnterSound);
         selectFrame.SetActive(true);
         selectTopStar.SetActive(true);
         selectBottomStar.SetActive(true);

@@ -97,6 +97,7 @@ public class RoundSystem : MonoBehaviour
         Sequence s = DOTween.Sequence();
         var origin = rectTransform.sizeDelta;
         rectTransform.sizeDelta = new Vector2(0, origin.y);
+        group.alpha = 1.0f;
         s.Append(rectTransform.DOSizeDelta(origin, warningDuration));
         s.Append(group.DOFade(0.0f, warningDuration).SetLoops(4));
 

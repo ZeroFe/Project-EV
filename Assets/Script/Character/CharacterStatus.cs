@@ -37,6 +37,7 @@ public class CharacterStatus : MonoBehaviour
             {
                 currentHp = maxHp;
             }
+
             OnHpChanged?.Invoke(currentHp, maxHp);
         }
     }
@@ -72,13 +73,13 @@ public class CharacterStatus : MonoBehaviour
         CurrentHp = CurrentHp;
     }
 
-    public void TakeDamage(int amount)
+    public virtual void TakeDamage(int amount)
     {
         CurrentHp -= amount;
         OnDamaged?.Invoke(amount);
     }
 
-    public void TakeHeal(int amount)
+    public virtual void TakeHeal(int amount)
     {
         CurrentHp += amount;
         OnHealed?.Invoke(amount);

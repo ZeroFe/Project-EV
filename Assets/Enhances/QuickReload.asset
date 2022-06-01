@@ -14,14 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enhanceName: "\uBE60\uB978 \uC7AC\uC7A5\uC804"
   codeName: QUICK_RELOAD
-  icon: {fileID: 21300000, guid: 2bf21505cdd439443920da3ce8c2b7a2, type: 3}
+  icon: {fileID: 21300000, guid: d2b023e707e910c45a8e8a3661269d0f, type: 3}
   description: "\uC7AC\uC7A5\uC804 \uC2DC\uAC04\uC774 \uC808\uBC18\uC774 \uB41C\uB2E4"
   prerequisites: []
   abilities:
   - reference: {fileID: 5332898974318805967}
-  passiveCondition:
-    reference: {fileID: 0}
-  passiveEffect: []
+  passives: []
 --- !u!114 &5332898974318805967
 MonoBehaviour:
   m_ObjectHideFlags: 1

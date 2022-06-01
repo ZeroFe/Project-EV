@@ -10,10 +10,12 @@ public class UpgradeWindow : MonoBehaviour
     public static UpgradeWindow Instance { get; private set; }
 
     [SerializeField] private List<UpgradeEnhanceView> upgradeEnhanceViews;
-    private CanvasGroup group;
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private AudioClip upgradeStartSound;
     [SerializeField] private AudioClip upgradeSelectSound;
+
+    private CanvasGroup group;
+    private AudioSource audioSource;
 
     private bool isInited = false;
 
@@ -23,10 +25,12 @@ public class UpgradeWindow : MonoBehaviour
         Instance = this;
 
         group = GetComponent<CanvasGroup>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
     {
+        // 초기 세팅 시 애니메이션 방지용
         if (!isInited)
         {
             isInited = true;
@@ -37,7 +41,7 @@ public class UpgradeWindow : MonoBehaviour
         DOTween.defaultTimeScaleIndependent = true;
         DOTween.timeScale = 1.0f;
         group.DOFade(1.0f, fadeDuration);
-        AudioManager.Instance.PlaySfxNonSpatial(upgradeStartSound);
+        audioSource.PlayOneShot(upgradeStartSound);
     }
 
     public void Start()
@@ -75,19 +79,19 @@ public class UpgradeWindow : MonoBehaviour
 
     private void SelectEnhance(Enhance enhance)
     {
-        AudioManager.Instance.PlaySfxNonSpatial(upgradeSelectSound);
+        audioSource.PlayOneShot(upgradeSelectSound);
         EnhanceSystem.Instance.ApplyEnhance(enhance);
-        // 다음 라운드 시작
-        RoundSystem.Instance.NextRound();
 
         // Animation
         Sequence s = DOTween.Sequence();
         s.Append(group.DOFade(0.0f, fadeDuration));
         // 잠시 대기용
-        s.Insert(fadeDuration + 2.0f, group.DOFade(0.0f, 0.1f));
+        s.Insert(fadeDuration + 1.0f, group.DOFade(0.0f, 0.1f));
 
         s.onComplete += () =>
         {
+            // 다음 라운드 시작
+            RoundSystem.Instance.NextRound();
             WindowSystem.Instance.CloseWindow(false);
         };
     }

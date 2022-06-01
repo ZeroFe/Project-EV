@@ -2,9 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 #if UNITY_EDITOR
@@ -75,10 +73,24 @@ public class Weapon : MonoBehaviour
     public Projectile projectilePrefab;
     public float projectileLaunchForce = 200.0f;
 
-    //public AudioClip 
+    [Header("UI")] 
+    [SerializeField] private EnemyDamagedDrawer criticalDrawer;
+    // 추후 무기 이미지도 바꿀 수 있게 만들겠음
+
+    // 무기에 따라 소리도 달라지므로, 차후 변경할 수 있게 public으로 선언
+    [Header("SFX")] 
+    [Tooltip("총을 쐈을 때 랜덤하게 재생할 사운드")]
+    public AudioClip[] shotSounds;
+    public AudioClip nonHitSound;
+    public AudioClip criticalSound;
+    public AudioClip reloadSound;
+    private AudioSource audioSource;
+
+    [Header("VFX")]
     public GameObject bulletEffectPrefab;
     public ParticleSystem muzzleEffect;
     public float muzzleEffectTime = 0.05f;
+    public LineRenderer rayTrailPrefab;
 
     public AdvancedSettings advancedSettings;
 
@@ -97,8 +109,6 @@ public class Weapon : MonoBehaviour
     private Camera _main;
 
     //Animator m_Animator;
-
-    AudioSource m_Source;
 
     Vector3 m_ConvertedMuzzlePos;
 
@@ -167,13 +177,32 @@ public class Weapon : MonoBehaviour
     {
         // 애니메이터, 소리는 후적용
         //m_Animator = GetComponentInChildren<Animator>();
-        //m_Source = GetComponentInChildren<AudioSource>();
+        audioSource = GetComponentInChildren<AudioSource>();
         _main = Camera.main;
 
         // 총알 설정
         currentAmmoCount = clipSize;
+    }
 
-        // 투사체 방식 설정
+    public void PickedUp(PlayerCtrl c)
+    {
+        owner = c;
+        ownerStatus = owner.GetComponent<PlayerStatus>();
+    }
+
+    private void Start()
+    {
+        WeaponView.Instance.UpdateAmmo(clipSize);
+        WeaponView.Instance.UpdateClipInfo(ClipSize);
+        WeaponView.Instance.UpdateAmmoCount(CurrentAmmoCount);
+
+        // Object Pool 설정
+        if (rayTrailPrefab != null)
+        {
+            const int trailPoolSize = 16;
+            PoolSystem.Instance.InitPool(rayTrailPrefab, trailPoolSize);
+        }
+
         if (projectilePrefab != null)
         {
             //a minimum of 4 is useful for weapon that have a clip size of 1 and where you can throw a second
@@ -186,19 +215,6 @@ public class Weapon : MonoBehaviour
                 m_ProjectilePool.Enqueue(p);
             }
         }
-    }
-
-    public void PickedUp(PlayerCtrl c)
-    {
-        owner = c;
-        ownerStatus = owner.GetComponent<PlayerStatus>();
-    }
-
-    private void Start()
-    {
-        WeaponView.Instance.UpdateAmmo(clipSize);
-        //WeaponView.Instance.UpdateClipInfo(ClipSize);
-        WeaponView.Instance.UpdateAmmoCount(CurrentAmmoCount);
     }
 
     // 총 발사
@@ -220,8 +236,8 @@ public class Weapon : MonoBehaviour
         //m_Animator.SetTrigger("fire");
 
         // 소리
-        //m_Source.pitch = Random.Range(0.7f, 1.0f);
-        //m_Source.PlayOneShot(FireAudioClip);
+        audioSource.pitch = Random.Range(0.7f, 1.0f);
+        audioSource.PlayOneShot(shotSounds[UnityEngine.Random.Range(0, shotSounds.Length)]);
 
         CameraShaker.Instance.Shake(0.2f, 0.05f * advancedSettings.screenShakeMultiplier);
 
@@ -251,7 +267,6 @@ public class Weapon : MonoBehaviour
 
     private void RaycastShot()
     {
-
         //compute the ratio of our spread angle over the fov to know in viewport space what is the possible offset from center
         //float spreadRatio = advancedSettings.spreadAngle / Controller.Instance.MainCamera.fieldOfView;
         float spreadRatio = advancedSettings.spreadAngle / Camera.main.fieldOfView;
@@ -283,36 +298,56 @@ public class Weapon : MonoBehaviour
                 if (targetStatus)
                 {
                     float attackPower = ownerStatus.attackPower * damageMultiplier;
-                    if (hit.collider.gameObject.CompareTag("Critical"))
+
+                    bool isCritical = hit.collider.gameObject.CompareTag("Critical");
+                    if (isCritical)
                     {
                         print("Critical");
-                        EnemyManager.Instance.DrawCritical(hit.point);
+                        Instantiate(criticalDrawer, hit.point, Quaternion.identity);
                         attackPower *= criticalMultiplier;
+                        // 총 쏘는 소리와 실행이 겹칠 수 있으므로, 따로 처리한다
+                        AudioManager.Instance.PlaySfxNonSpatial(criticalSound);
                     }
                     targetStatus.TakeDamage((int)attackPower);
+
+                    // VFX
+                    GameObject bloodEffectObj = PoolSystem.Instance.GetInstance<GameObject>(
+                        isCritical ? targetStatus.CriticalBloodEffect : targetStatus.HitBloodEffect);
+                    if (bloodEffectObj != null)
+                    {
+                        bloodEffectObj.SetActive(true);
+                        bloodEffectObj.transform.position = hit.point;
+                        bloodEffectObj.transform.forward = hit.normal;
+                        bloodEffectObj.GetComponent<ParticleSystem>().Play();
+                    }
                 }
                 else
                 {
                     Debug.LogError($"enemy {hit.collider.gameObject.name}'s status not find");
                 }
             }
+            else
+            {
+                // 빚맞은 경우 지형(쇠)에 맞았다 볼 수 있음
+                AudioManager.Instance.PlaySFX(nonHitSound, hit.collider.transform.position);
+            }
         }
 
         // VFX : 이후 적용
-        //if (PrefabRayTrail != null)
-        //{
-        //    //var pos = new Vector3[] { GetCorrectedMuzzlePlace(), hitPosition };
-        //    var pos = new Vector3[] { transform.position, hitPosition };
-        //    var trail = PoolSystem.Instance.GetInstance<LineRenderer>(PrefabRayTrail);
-        //    trail.gameObject.SetActive(true);
-        //    trail.SetPositions(pos);
-        //    m_ActiveTrails.Add(new ActiveTrail()
-        //    {
-        //        remainingTime = 0.3f,
-        //        direction = (pos[1] - pos[0]).normalized,
-        //        renderer = trail
-        //    });
-        //}
+        if (rayTrailPrefab != null)
+        {
+            //var pos = new Vector3[] { GetCorrectedMuzzlePlace(), hitPosition };
+            var pos = new Vector3[] { transform.position, hitPosition };
+            var trail = PoolSystem.Instance.GetInstance<LineRenderer>(rayTrailPrefab);
+            trail.gameObject.SetActive(true);
+            trail.SetPositions(pos);
+            m_ActiveTrails.Add(new ActiveTrail()
+            {
+                remainingTime = 0.3f,
+                direction = (pos[1] - pos[0]).normalized,
+                renderer = trail
+            });
+        }
     }
 
     private void ProjectileShot()
@@ -344,11 +379,11 @@ public class Weapon : MonoBehaviour
             return;
 
         // SFX : 나중에 넣기
-        //if (ReloadAudioClip != null)
-        //{
-        //    m_Source.pitch = Random.Range(0.7f, 1.0f);
-        //    m_Source.PlayOneShot(ReloadAudioClip);
-        //}
+        if (reloadSound != null)
+        {
+            audioSource.pitch = Random.Range(0.7f, 1.0f);
+            audioSource.PlayOneShot(reloadSound);
+        }
 
         //the state will only change next frame, so we set it right now.
         m_CurrentState = WeaponState.Reloading;
@@ -364,26 +399,27 @@ public class Weapon : MonoBehaviour
     {
         UpdateWeaponState();
 
-        //Vector3[] pos = new Vector3[2];
-        //for (int i = 0; i < m_ActiveTrails.Count; ++i)
-        //{
-        //    var activeTrail = m_ActiveTrails[i];
-            
-        //    activeTrail.renderer.GetPositions(pos);
-        //    activeTrail.remainingTime -= Time.deltaTime;
+        // Trail 시간 계산
+        Vector3[] pos = new Vector3[2];
+        for (int i = 0; i < m_ActiveTrails.Count; ++i)
+        {
+            var activeTrail = m_ActiveTrails[i];
 
-        //    pos[0] += activeTrail.direction * 50.0f * Time.deltaTime;
-        //    pos[1] += activeTrail.direction * 50.0f * Time.deltaTime;
-            
-        //    m_ActiveTrails[i].renderer.SetPositions(pos);
-            
-        //    if (m_ActiveTrails[i].remainingTime <= 0.0f)
-        //    {
-        //        m_ActiveTrails[i].renderer.gameObject.SetActive(false);
-        //        m_ActiveTrails.RemoveAt(i);
-        //        i--;
-        //    }
-        //}
+            activeTrail.renderer.GetPositions(pos);
+            activeTrail.remainingTime -= Time.deltaTime;
+
+            pos[0] += activeTrail.direction * (50.0f * Time.deltaTime);
+            pos[1] += activeTrail.direction * (50.0f * Time.deltaTime);
+
+            m_ActiveTrails[i].renderer.SetPositions(pos);
+
+            if (m_ActiveTrails[i].remainingTime <= 0.0f)
+            {
+                m_ActiveTrails[i].renderer.gameObject.SetActive(false);
+                m_ActiveTrails.RemoveAt(i);
+                i--;
+            }
+        }
     }
 
     void UpdateWeaponState()

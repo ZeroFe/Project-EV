@@ -17,7 +17,7 @@ public class UpgradeSelectStar : MonoBehaviour
 
     void Update()
     {
-        if (Vector3.Distance(transform.position, routePoses[targetIndex].position) < 0.1f)
+        if (Vector3.Distance(transform.position, routePoses[targetIndex].position) < 0.7f)
         {
             targetIndex = (targetIndex + 1) % routePoses.Length;
         }

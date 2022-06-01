@@ -42,7 +42,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enhanceName: "\uCCB4\uB825 \uAC15\uD654 2"
   codeName: HP_ENHANCE_2
-  icon: {fileID: 21300000, guid: 5cc9c4a6db9a74a40aaed761fc99294c, type: 3}
+  icon: {fileID: 21300000, guid: ee3d4432252712147a03780a0611fa7e, type: 3}
   description: "\uCCB4\uB825\uC744 50 \uC99D\uAC00 \uC2DC\uD0A8\uB2E4\n\uB300\uC26C\uB97C
     \uB204\uB974\uBA74 \uCCB4\uB825\uC744 10 \uD68C\uBCF5\uD55C\uB2E4"
   prerequisites: []

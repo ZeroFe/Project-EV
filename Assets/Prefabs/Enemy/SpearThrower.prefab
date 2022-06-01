@@ -340,6 +340,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 30
   attackPower: 5
+  hitBloodEffectPrefab: {fileID: 6548881393966666535, guid: df54b602fddebe14899d5dd306a40dc5, type: 3}
+  criticalBloodEffectPrefab: {fileID: 1479146255802732435, guid: fd6332a86fd4dcc4f904480fac9d1104, type: 3}
 --- !u!114 &7341059892953949926
 MonoBehaviour:
   m_ObjectHideFlags: 0

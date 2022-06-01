@@ -13,10 +13,27 @@ public class EnemyStatus : CharacterStatus
 {
     //public delegate void Damage
 
-    [FormerlySerializedAs("damage")] public int attackPower = 3;
+    public int attackPower = 3;
+
+    [Header("VFX")]
+    [SerializeField] private ParticleSystem hitBloodEffectPrefab;
+    [SerializeField] private ParticleSystem criticalBloodEffectPrefab;
+
+    public ParticleSystem HitBloodEffect => hitBloodEffectPrefab;
+    public ParticleSystem CriticalBloodEffect => criticalBloodEffectPrefab;
 
     private void Awake()
     {
+        int size = 10;
+        if (hitBloodEffectPrefab != null)
+        {
+            PoolSystem.Instance.InitPool(hitBloodEffectPrefab, size);
+        }
+
+        if (criticalBloodEffectPrefab != null)
+        {
+            PoolSystem.Instance.InitPool(criticalBloodEffectPrefab, size);
+        }
     }
 
     protected override void OnEnable()
@@ -41,13 +58,9 @@ public class EnemyStatus : CharacterStatus
 
     void Start()
     {
-        OnDamaged += (int amount) => EnemyManager.Instance.DrawDamaged(gameObject, amount);
-        OnDead += RoundSystem.Instance.CheckRoundEnd;
-    }
-
-    void Update()
-    {
-
+        // 공통 이벤트 설정
+        OnDamaged += (int amount) => EnemyManager.Instance.InvokeEnemyDamaged(gameObject, amount);
+        OnDead += () => EnemyManager.Instance.InvokeEnemyDead(gameObject);
     }
 
     public void PowerUp(float powerupRate)

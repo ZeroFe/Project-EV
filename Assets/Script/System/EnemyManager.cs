@@ -14,25 +14,32 @@ public class EnemyManager : MonoBehaviour
 
     // 몹 전체한테 적용하는 이벤트
     public delegate void TakeDamageHandler(GameObject sender, int amount);
+    public delegate void EnemyDeadHandler(GameObject sender);
 
-    [FormerlySerializedAs("damageDrawer")] [SerializeField]
-    private GameObject damageDrawerPrefab;
+    public event TakeDamageHandler onEnemyTakeDamage;
+    public event EnemyDeadHandler onEnemyDead;
+
+
+
+    [SerializeField] private GameObject damageDrawerPrefab;
 
     private GameObject[] targets = new GameObject[2];
-    private GameObject player;
-    private GameObject playerBase;
 
     private void Awake()
     {
         Instance = this;
+
+        Debug.Assert(damageDrawerPrefab, "Error : Damage Drawer not setting");
     }
 
     public void Start()
     {
-        Debug.Assert(damageDrawerPrefab, "Error : Damage Drawer not setting");
-
         targets[0] = GameObject.Find("Player");
         targets[1] = GameObject.Find("Base");
+
+        // 적에게 공통적으로 적용되어야 하는 이벤트 설정
+        onEnemyDead += (sender) => RoundSystem.Instance.CheckRoundEnd();
+        onEnemyTakeDamage += DrawDamaged;
     }
 
     public void InitEnemy(GameObject enemy, GameObject route)
@@ -43,11 +50,14 @@ public class EnemyManager : MonoBehaviour
         eFSM.Init(targets[(int)eFSM.firstTarget], route);
     }
 
-    public void DrawCritical(Vector3 position)
+    public void InvokeEnemyDamaged(GameObject sender, int amount)
     {
-        var go = Instantiate(damageDrawerPrefab, position, Quaternion.identity);
-        var damagedDrawer = go.GetComponent<EnemyDamagedDrawer>();
-        damagedDrawer.SetDrawCritical(position);
+        onEnemyTakeDamage?.Invoke(sender, amount);
+    }
+
+    public void InvokeEnemyDead(GameObject sender)
+    {
+        onEnemyDead?.Invoke(sender);
     }
 
     /// <summary>
@@ -57,6 +67,7 @@ public class EnemyManager : MonoBehaviour
     {
         var go = Instantiate(damageDrawerPrefab, sender.transform.position, Quaternion.identity);
         var damagedDrawer = go.GetComponent<EnemyDamagedDrawer>();
-        damagedDrawer.SetDrawInfo(amount, Color.red, sender.transform.position);
+        damagedDrawer.SetDraw(amount);
+        //damagedDrawer.SetDrawInfo(amount, Color.red, sender.transform.position);
     }
 }
