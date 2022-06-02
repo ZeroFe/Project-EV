@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BaseHitManager : MonoBehaviour
 {
@@ -23,6 +24,13 @@ public class BaseHitManager : MonoBehaviour
 
     [SerializeField] 
     private HpBarTextExtend baseHpBar;
+
+    [Header("Hit Flash Animation")] 
+    [SerializeField]
+    private Image baseFillImage;
+    [SerializeField] private Color normalBaseColor;
+    [SerializeField] private Color hitBaseColor;
+    private bool doHitAnimation = false;
 
     [Header("Crisis Flash Animation")]
     [SerializeField] 
@@ -55,24 +63,31 @@ public class BaseHitManager : MonoBehaviour
 
     private void OnBaseHit()
     {
-        // 맞았을 때 기지 공격 당함 알림음
-        //audioSource.PlayOneShot(hitNotifySound);
+        if (!doHitAnimation)
+        {
+            doHitAnimation = true;
+            // 맞았을 때 기지 공격 당함 알림음
+            audioSource.PlayOneShot(hitNotifySound);
+
+            baseFillImage.color = normalBaseColor;
+            var hitFlash = baseFillImage.DOColor(hitBaseColor, 0.5f).SetLoops(4);
+            hitFlash.onComplete = () =>
+            {
+                baseFillImage.color = normalBaseColor;
+                doHitAnimation = false;
+            };
+        }
 
         // 맞았을 때 잠시 체력 바 표시
 
-        // 미니맵에 Base 위치에 해당하는 Indicator를 출력한다
-    }
 
-    // 기지 맞고 있음을 알리는 점등 애니메이션
-    IEnumerator IEHitNotify()
-    {
-        yield return 0;
+        // 미니맵에 Base 위치에 해당하는 Indicator를 출력한다
     }
 
     private void OnEnterCrisis()
     {
         // 위험 상태 알림 소리
-        //audioSource.PlayOneShot(crisisNotifySound);
+        audioSource.PlayOneShot(crisisNotifySound);
 
         // 위험 상태이면 계속 점멸해야함
         foreach (var light in crisisNotifyLights)

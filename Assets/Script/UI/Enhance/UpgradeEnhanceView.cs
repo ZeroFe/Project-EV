@@ -31,7 +31,6 @@ public class UpgradeEnhanceView : MonoBehaviour,
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("Point Enter");
         audioSource.PlayOneShot(pointEnterSound);
         selectFrame.SetActive(true);
         selectTopStar.SetActive(true);
@@ -40,7 +39,6 @@ public class UpgradeEnhanceView : MonoBehaviour,
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("Point Exit");
         selectFrame.SetActive(false);
         selectTopStar.SetActive(false);
         selectBottomStar.SetActive(false);

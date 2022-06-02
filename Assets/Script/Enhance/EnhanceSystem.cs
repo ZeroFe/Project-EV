@@ -7,8 +7,10 @@ using UnityEngine;
 /// 강화 목록을 관리하는 클래스
 /// </summary>
 [DisallowMultipleComponent]
-public class EnhanceSystem : Singleton<EnhanceSystem>
+public class EnhanceSystem : MonoBehaviour
 {
+    public static EnhanceSystem Instance { get; private set; }
+
     // 플레이어만 아이템 적용하면 되므로 플레이어를 추가한다
     [SerializeField] private GameObject player;
     private Inventory playerInventory;
@@ -28,6 +30,8 @@ public class EnhanceSystem : Singleton<EnhanceSystem>
 
     private void Awake()
     {
+        Instance = this;
+
         enhanceDatabase = Resources.Load<EnhanceDatabase>("EnhanceDatabase");
 
         player = GameObject.Find("Player");

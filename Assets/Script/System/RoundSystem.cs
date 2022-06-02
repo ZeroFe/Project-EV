@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Sequence = DG.Tweening.Sequence;
+using DG.Tweening;
 
 // 디버그를 위해 의도적으로 DisallowMultipleComponent는 넣지 않는다
 // 여러 디버그용 Round를 제작해야할 수도 있기 때문
@@ -46,14 +46,19 @@ public class RoundSystem : MonoBehaviour
     [SerializeField] private AudioClip victorySFX;
     [SerializeField] private AudioClip victoryBGM;
 
+    private AudioSource audioSource;
+
     private void Awake()
     {
         Debug.Assert(!Instance, "There is two or more Round System");
         Instance = this;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
-    public void Start()
+    IEnumerator Start()
     {
+        yield return new WaitForSeconds(0.1f);
         // 원래는 게임 시작 시 무기를 선택한 후, 라운드를 시작해야 함
         // 일단 간이 테스트로 시작하자마자 라운드 진행
         NextRound();
@@ -210,9 +215,28 @@ public class RoundSystem : MonoBehaviour
     {
         gameClearPanel.SetActive(true);
         var gameClearGroup = gameClearPanel.GetComponent<CanvasGroup>();
+        
+        audioSource.PlayOneShot(victorySFX);
+        AudioManager.Instance.StopBGM();
 
         Sequence s = DOTween.Sequence();
-        //s.Append(victoryTextImage.transform.DOScale(victoryAnimScales.x, victoryAnimDuration).set)
+        s.SetUpdate(true);
+        s.Append(gameClearGroup.DOFade(1.0f, 0.2f));
+        // 글자 연출
+        s.AppendCallback(() =>
+        {
+            victoryTextImage.gameObject.SetActive(true);
+            victoryTextImage.transform.localScale = Vector3.one * victoryAnimScales.y;
+        });
+        s.Append(victoryTextImage.transform.DOScale(victoryAnimScales.x, victoryAnimDuration)
+                .SetEase(Ease.InOutElastic));
+        // 버튼 연출
+        s.AppendCallback(() =>
+        {
+            WindowSystem.Instance.OpenWindow(victoryButtonGroup.gameObject, false);
+            victoryButtonGroup.alpha = 0.0f;
+        });
+        s.Append(victoryButtonGroup.DOFade(1.0f, 0.3f));
     }
 
     #endregion
