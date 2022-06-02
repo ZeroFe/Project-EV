@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine.UI;
 using Sequence = DG.Tweening.Sequence;
 
@@ -32,12 +31,20 @@ public class RoundSystem : MonoBehaviour
     private float warningDuration = 0.5f;
     [SerializeField] private Image SafeImage;
     [SerializeField] private float safeDrawDuration = 0.5f;
-    public GameObject GameClearUI;
 
     [Header("Sound")] 
     [SerializeField] private AudioClip RoundStartSound;
 
     [SerializeField] private AudioClip UpgradeStartSound;
+
+    [Header("Game Clear")]
+    [SerializeField] private GameObject gameClearPanel;
+    [SerializeField] private Image victoryTextImage;
+    [SerializeField] private Vector2 victoryAnimScales = new Vector2(1.5f, 2.5f);
+    [SerializeField] private float victoryAnimDuration = 0.3f;
+    [SerializeField] private CanvasGroup victoryButtonGroup;
+    [SerializeField] private AudioClip victorySFX;
+    [SerializeField] private AudioClip victoryBGM;
 
     private void Awake()
     {
@@ -70,7 +77,8 @@ public class RoundSystem : MonoBehaviour
             if (currentRoundIndex == rounds.Count - 1)
             {
                 // 게임 끝났으면 게임 완료 처리
-                WindowSystem.Instance.OpenWindow(GameClearUI, false);
+                //WindowSystem.Instance.OpenWindow(GameClearUI, false);
+                GameClear();
             }
             // 아니면 업그레이드 띄우기
             else
@@ -196,6 +204,18 @@ public class RoundSystem : MonoBehaviour
 
     #endregion
 
+    #region Game Clear
+
+    private void GameClear()
+    {
+        gameClearPanel.SetActive(true);
+        var gameClearGroup = gameClearPanel.GetComponent<CanvasGroup>();
+
+        Sequence s = DOTween.Sequence();
+        //s.Append(victoryTextImage.transform.DOScale(victoryAnimScales.x, victoryAnimDuration).set)
+    }
+
+    #endregion
 
     #region Debug
 

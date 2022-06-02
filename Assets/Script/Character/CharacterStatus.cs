@@ -76,12 +76,18 @@ public class CharacterStatus : MonoBehaviour
     public virtual void TakeDamage(int amount)
     {
         CurrentHp -= amount;
-        OnDamaged?.Invoke(amount);
+        if (!isDead)
+        {
+           OnDamaged?.Invoke(amount);
+        }
     }
 
     public virtual void TakeHeal(int amount)
     {
         CurrentHp += amount;
-        OnHealed?.Invoke(amount);
+        if (!isDead)
+        {
+           OnHealed?.Invoke(amount);
+        }
     }
 }

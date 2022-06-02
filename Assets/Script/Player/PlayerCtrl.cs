@@ -56,7 +56,7 @@ public class PlayerCtrl : MonoBehaviour
     private float horizontalInput;
     private float verticalInput;
 
-    // Action
+    // Event
     public event Action OnJump;
     public event Action OnDash;
     public event Action OnDashEnd;

@@ -35,16 +35,15 @@ public class EnemyDamagedDrawer : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void SetDrawCritical(Vector3 position)
-    {
-        damageText.text = "Critical";
-        damageText.color = Color.red;
-        _gravity = -1.0f;
-    }
-
     // 나머지 값들은 Prefab에서 설정하도록 만듦
     public void SetDraw(int damage)
     {
+        moveVec = new Vector3(
+            Random.Range(-_initRange, _initRange),
+            Random.Range(-_initRange, _initRange) + _bonusUpVelocity,
+            Random.Range(-_initRange, _initRange)
+        );
+
         damageText.text = damage.ToString();
         damageText.transform.localScale = Vector3.one * Mathf.Log10(damage);
     }

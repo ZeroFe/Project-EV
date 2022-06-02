@@ -19,14 +19,21 @@ public class PlayerHitManager : MonoBehaviour
     [SerializeField, Tooltip("Fade In 시간 / Fade Out 시간")] 
     private Vector2 animationTime = new Vector2(0.1f, 0.2f);
 
+    [Header("Sound")]
+    [SerializeField] private AudioClip crisisHeartbeatSound;
+
+    private AudioSource audioSource;
+
     private Vector2 currentAlpha;
     private Sequence sequence;
 
     private void Awake()
     {
         bloodImage = GetComponent<Image>();
+        audioSource = GetComponent<AudioSource>();
 
         Debug.Assert(status, "Error : Player Status not set");
+        Debug.Assert(crisisHeartbeatSound, "Error : Crisis Heartbeat Sound not set");
     }
 
     private void Start()
@@ -49,6 +56,7 @@ public class PlayerHitManager : MonoBehaviour
     private void OnEnterCrisis()
     {
         currentAlpha = crisisAlpha;
+        audioSource.PlayOneShot(crisisHeartbeatSound);
     }
 
     private void OnExitCrisis()

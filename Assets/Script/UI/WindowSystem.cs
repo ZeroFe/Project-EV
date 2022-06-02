@@ -18,7 +18,7 @@ public class WindowSystem : MonoBehaviour
 {
     public static WindowSystem Instance { get; private set; }
 
-    //public Texture2D
+    public Texture2D cursorTexture;
 
     class WindowClass
     {
@@ -44,7 +44,7 @@ public class WindowSystem : MonoBehaviour
     void Start()
     {
         Debug.Log("Window System Actived");
-        //Cursor.SetCursor();
+        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.ForceSoftware);
         // 게임 시작 시 윈도우는 전부 비활성화 상태이므로 커서를 안 보여줘야 한다
         SetCursorDisplay(false);
     }
@@ -56,7 +56,7 @@ public class WindowSystem : MonoBehaviour
 #if !UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-
+            
         }
 #else
         if (Input.GetKeyDown(KeyCode.Backspace))
