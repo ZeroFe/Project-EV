@@ -16,11 +16,11 @@ public class EnemyStatus : CharacterStatus
     public int attackPower = 3;
 
     [Header("VFX")]
-    [SerializeField] private ParticleSystem hitBloodEffectPrefab;
-    [SerializeField] private ParticleSystem criticalBloodEffectPrefab;
+    [SerializeField] private GameObject hitBloodEffectPrefab;
+    [SerializeField] private GameObject criticalBloodEffectPrefab;
 
-    public ParticleSystem HitBloodEffect => hitBloodEffectPrefab;
-    public ParticleSystem CriticalBloodEffect => criticalBloodEffectPrefab;
+    public GameObject HitBloodEffect => hitBloodEffectPrefab;
+    public GameObject CriticalBloodEffect => criticalBloodEffectPrefab;
 
     private void Awake()
     {

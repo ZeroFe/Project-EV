@@ -10,8 +10,8 @@ public class PlayerCtrl : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5.0f;
     [SerializeField] private AudioClip[] moveSounds;
-    private int previousMoveSound = -1;
-    
+    private int previousMoveSoundIndex = -1;
+
     private float finalSpeed;
 
     [Header("Dash")]
@@ -52,12 +52,14 @@ public class PlayerCtrl : MonoBehaviour
     // other
     private CharacterController cc;
     private Camera _main;
+    private AudioSource _audioSource;
 
     private float horizontalInput;
     private float verticalInput;
 
     // Event
-    public event Action OnJump;
+    public event Action OnJumpEnter;
+    public event Action OnJumpExit;
     public event Action OnDash;
     public event Action OnDashEnd;
     
@@ -65,6 +67,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         cc = GetComponent<CharacterController>();
         _main = Camera.main;
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -73,7 +76,6 @@ public class PlayerCtrl : MonoBehaviour
         StartCoroutine(RecoverDashCooldown());
     }
 
-    #region Movement
     // Update is called once per frame
     void Update()
     {
@@ -89,6 +91,7 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    #region Movement
     //private void GroundedCheck()
     //{
     //    // set sphere position, with offset
@@ -104,7 +107,19 @@ public class PlayerCtrl : MonoBehaviour
         Vector3 dir = new Vector3(horizontalInput, 0, verticalInput);
         dir = dir.normalized;
 
-        // 2-1. 메인 카메라를 기준으로 방향을 변환한다.
+        // 음악 재생
+        if (dir != Vector3.zero && !_audioSource.isPlaying && !isDashing && !isJumping)
+        {
+            int idx = UnityEngine.Random.Range(0, moveSounds.Length);
+            if (idx == previousMoveSoundIndex)
+            {
+                idx = (idx + 1) % moveSounds.Length;
+            }
+            previousMoveSoundIndex = idx;
+
+            _audioSource.PlayOneShot(moveSounds[idx]);
+        }
+
         dir = _main.transform.TransformDirection(dir);
 
         CheckDash();
@@ -133,6 +148,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             yVelocity = jumpPower;
             isJumping = true;
+            _audioSource.PlayOneShot(jumpSound);
         }
     }
 
@@ -144,6 +160,7 @@ public class PlayerCtrl : MonoBehaviour
             if (!isDashing && currentDashCount > 0)
             {
                 currentDashCount--;
+                _audioSource.PlayOneShot(dashSound);
                 StartCoroutine(Dash());
             }
         }

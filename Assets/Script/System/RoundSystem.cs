@@ -36,6 +36,21 @@ public class RoundSystem : MonoBehaviour
     [SerializeField] private AudioClip RoundStartSound;
 
     [SerializeField] private AudioClip UpgradeStartSound;
+    
+    /* 게임 시작 연출
+     * 메시지 주고 받음
+     * 화면 지진 나면서 천장 불빛 깜빡임
+     * 적 공격 온다 음성
+     */
+
+    //private AudioClip GameStart
+
+    [Header("Round Start Warning")]
+    [SerializeField] private Light[] ceilingLights;
+    [SerializeField] private Color ceilingLightNormalColor;
+    [SerializeField] private Color ceilingLightWarningColor;
+    [SerializeField, Tooltip("normal / warning min / warning max")] 
+    private Vector3 ceilingLightIntensity;
 
     [Header("Game Clear")]
     [SerializeField] private GameObject gameClearPanel;
@@ -61,6 +76,9 @@ public class RoundSystem : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         // 원래는 게임 시작 시 무기를 선택한 후, 라운드를 시작해야 함
         // 일단 간이 테스트로 시작하자마자 라운드 진행
+        Sequence s = DOTween.Sequence();
+
+
         NextRound();
     }
 
@@ -111,12 +129,30 @@ public class RoundSystem : MonoBehaviour
         var origin = rectTransform.sizeDelta;
         rectTransform.sizeDelta = new Vector2(0, origin.y);
         group.alpha = 1.0f;
-        s.Append(rectTransform.DOSizeDelta(origin, warningDuration));
+        foreach (var light in ceilingLights)
+        {
+            light.color = ceilingLightWarningColor;
+            s.Insert(0.0f, light.DOIntensity(ceilingLightIntensity.z, warningDuration));
+        }
+        s.Insert(0.0f, rectTransform.DOSizeDelta(origin, warningDuration));
+        s.InsertCallback(0.5f, () =>
+        {
+            foreach (var light in ceilingLights)
+            {
+                light.DOIntensity(ceilingLightIntensity.y, warningDuration).SetLoops(4);
+            }
+        });
         s.Append(group.DOFade(0.0f, warningDuration).SetLoops(4));
 
         s.onComplete = () =>
         {
             WarningUI.SetActive(false);
+
+            foreach (var light in ceilingLights)
+            {
+                light.color = ceilingLightNormalColor;
+                light.intensity = ceilingLightIntensity.x;
+            }
 
             currentRoundIndex++;
             // 리스트에서 라운드 정보를 읽고 시작한다
@@ -213,18 +249,25 @@ public class RoundSystem : MonoBehaviour
 
     private void GameClear()
     {
-        gameClearPanel.SetActive(true);
         var gameClearGroup = gameClearPanel.GetComponent<CanvasGroup>();
         
-        audioSource.PlayOneShot(victorySFX);
         AudioManager.Instance.StopBGM();
 
         Sequence s = DOTween.Sequence();
         s.SetUpdate(true);
+
+        s.Append(DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 3.0f));
+        s.AppendCallback(() =>
+        {
+            gameClearPanel.SetActive(true);
+            gameClearGroup.alpha = 0.0f;
+            victoryButtonGroup.gameObject.SetActive(false);
+        });
         s.Append(gameClearGroup.DOFade(1.0f, 0.2f));
         // 글자 연출
         s.AppendCallback(() =>
         {
+            audioSource.PlayOneShot(victorySFX);
             victoryTextImage.gameObject.SetActive(true);
             victoryTextImage.transform.localScale = Vector3.one * victoryAnimScales.y;
         });

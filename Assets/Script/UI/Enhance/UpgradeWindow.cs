@@ -12,7 +12,6 @@ public class UpgradeWindow : MonoBehaviour
     [SerializeField] private List<UpgradeEnhanceView> upgradeEnhanceViews;
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private AudioClip upgradeStartSound;
-    [SerializeField] private AudioClip upgradeSelectSound;
 
     private CanvasGroup group;
     private AudioSource audioSource;
@@ -79,14 +78,11 @@ public class UpgradeWindow : MonoBehaviour
 
     private void SelectEnhance(Enhance enhance)
     {
-        audioSource.PlayOneShot(upgradeSelectSound);
         EnhanceSystem.Instance.ApplyEnhance(enhance);
 
         // Animation
         Sequence s = DOTween.Sequence();
         s.Append(group.DOFade(0.0f, fadeDuration));
-        // 잠시 대기용
-        s.Insert(fadeDuration + 1.0f, group.DOFade(0.0f, 0.1f));
 
         s.onComplete += () =>
         {

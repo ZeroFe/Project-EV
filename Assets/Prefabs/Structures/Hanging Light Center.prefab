@@ -211,7 +211,7 @@ GameObject:
   - component: {fileID: 5740353854731745632}
   - component: {fileID: 8120476571114535065}
   m_Layer: 0
-  m_Name: Overhead Light Source (7)
+  m_Name: Overhead Light Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

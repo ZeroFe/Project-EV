@@ -70,7 +70,7 @@ public class BaseHitManager : MonoBehaviour
             audioSource.PlayOneShot(hitNotifySound);
 
             baseFillImage.color = normalBaseColor;
-            var hitFlash = baseFillImage.DOColor(hitBaseColor, 0.5f).SetLoops(4);
+            var hitFlash = baseFillImage.DOColor(hitBaseColor, 0.5f).SetLoops(6);
             hitFlash.onComplete = () =>
             {
                 baseFillImage.color = normalBaseColor;

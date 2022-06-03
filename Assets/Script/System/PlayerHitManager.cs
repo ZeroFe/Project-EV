@@ -19,8 +19,10 @@ public class PlayerHitManager : MonoBehaviour
     [SerializeField, Tooltip("Fade In 시간 / Fade Out 시간")] 
     private Vector2 animationTime = new Vector2(0.1f, 0.2f);
 
-    [Header("Sound")]
+    [Header("Sound")] 
+    [SerializeField] private AudioClip hitPainSound;
     [SerializeField] private AudioClip crisisHeartbeatSound;
+    [SerializeField] private AudioClip deadPainSound;
 
     private AudioSource audioSource;
 
@@ -33,7 +35,9 @@ public class PlayerHitManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
         Debug.Assert(status, "Error : Player Status not set");
+        Debug.Assert(hitPainSound, "Error : Hit Pain Sound not set");
         Debug.Assert(crisisHeartbeatSound, "Error : Crisis Heartbeat Sound not set");
+        Debug.Assert(deadPainSound, "Error : Dead Pain Sound not set");
     }
 
     private void Start()
@@ -44,10 +48,12 @@ public class PlayerHitManager : MonoBehaviour
         status.OnDamaged += (amount) => OnPlayerHit();
         status.onEnterCrisis += OnEnterCrisis;
         status.onExitCrisis += OnExitCrisis;
+        status.OnDead += OnDead;
     }
 
     public void OnPlayerHit()
     {
+        audioSource.PlayOneShot(hitPainSound);
         sequence = DOTween.Sequence();
         sequence.Append(bloodImage.DOFade(currentAlpha.y, animationTime.x));
         sequence.Append(bloodImage.DOFade(currentAlpha.x, animationTime.y));
@@ -62,5 +68,10 @@ public class PlayerHitManager : MonoBehaviour
     private void OnExitCrisis()
     {
         currentAlpha = hitOverlayAlpha;
+    }
+
+    private void OnDead()
+    {
+        audioSource.PlayOneShot(deadPainSound);
     }
 }

@@ -20,7 +20,14 @@ public class UpgradeEnhanceView : MonoBehaviour,
     [SerializeField] private GameObject selectBottomStar;
 
     [SerializeField] private AudioClip pointEnterSound;
+    [SerializeField] private AudioClip upgradeSelectSound;
     [SerializeField] private AudioSource audioSource;
+
+    [Header("Select Animation")] 
+    [SerializeField]
+    private Transform selectLightImageTr;
+    [SerializeField] private Vector2 selectAnimPosX = new Vector2(-50.0f, 600.0f);
+    [SerializeField] private float animationTime = 0.3f;
 
     public Action<Enhance> SelectEnhanceHandler;
     private Enhance upgradeEnhance;
@@ -47,8 +54,19 @@ public class UpgradeEnhanceView : MonoBehaviour,
     public void OnPointerDown(PointerEventData eventData)
     {
         Debug.Log("Mouse Down");
-        // 상위 ui에게 알린다
-        SelectEnhanceHandler.Invoke(upgradeEnhance);
+        audioSource.PlayOneShot(upgradeSelectSound);
+
+        // 애니메이션
+        Sequence s = DOTween.Sequence();
+        selectLightImageTr.position =
+            new Vector3(selectAnimPosX.x, selectLightImageTr.position.y, selectLightImageTr.position.z);
+        s.Append(selectLightImageTr.transform.DOMoveX(selectAnimPosX.y, animationTime));
+
+        s.onComplete = () =>
+        {
+            // 상위 ui에게 알린다
+            SelectEnhanceHandler.Invoke(upgradeEnhance);
+        };
     }
 
     public void DrawEnhance(Enhance enhance)

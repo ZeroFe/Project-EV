@@ -20,7 +20,7 @@ public class CameraShaker : MonoBehaviour
     {
         if (m_RemainingShakeTime > 0)
         {
-            m_RemainingShakeTime -= Time.deltaTime;
+            m_RemainingShakeTime -= Time.unscaledDeltaTime;
 
             if (m_RemainingShakeTime <= 0)
             {

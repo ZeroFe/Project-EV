@@ -313,9 +313,10 @@ public class Weapon : MonoBehaviour
                     // VFX
                     GameObject bloodEffectObj = PoolSystem.Instance.GetInstance<GameObject>(
                         isCritical ? targetStatus.CriticalBloodEffect : targetStatus.HitBloodEffect);
-                    if (bloodEffectObj != null)
+                    if (bloodEffectObj)
                     {
                         bloodEffectObj.SetActive(true);
+                        print($"blood Effect : {hit.point}");
                         bloodEffectObj.transform.position = hit.point;
                         bloodEffectObj.transform.forward = hit.normal;
                         bloodEffectObj.GetComponent<ParticleSystem>().Play();
